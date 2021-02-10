@@ -78,10 +78,10 @@ INSERT INTO Argument (name, position, hook, datatype) VALUES -- Execution
                                                              -- Filesystem
                                                              -- creat
                                                              ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="creat"), (SELECT id FROM Datatype WHERE datatype="String")),
-                                                             ("mode", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="creat"), (SELECT id FROM Datatype WHERE datatype="Struct")),
+                                                             ("mode", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="creat"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
                                                              -- creat64
                                                              ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="creat64"), (SELECT id FROM Datatype WHERE datatype="String")),
-                                                             ("mode", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="creat64"), (SELECT id FROM Datatype WHERE datatype="Struct")),
+                                                             ("mode", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="creat64"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
                                                              -- fdopen
                                                              ("fd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fdopen"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              ("mode", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fdopen"), (SELECT id FROM Datatype WHERE datatype="String")),
@@ -102,21 +102,21 @@ INSERT INTO Argument (name, position, hook, datatype) VALUES -- Execution
                                                              -- open
                                                              ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open"), (SELECT id FROM Datatype WHERE datatype="String")),
                                                              ("flags", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
-                                                             ("mode", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open"), (SELECT id FROM Datatype WHERE datatype="StructVariadic")),
+                                                             ("mode", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedVariadic")),
                                                              -- open64
                                                              ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open64"), (SELECT id FROM Datatype WHERE datatype="String")),
                                                              ("flags", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open64"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
-                                                             ("mode", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open64"), (SELECT id FROM Datatype WHERE datatype="StructVariadic")),
+                                                             ("mode", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open64"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedVariadic")),
                                                              -- openat
                                                              ("dirfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              ("pathname", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat"), (SELECT id FROM Datatype WHERE datatype="String")),
                                                              ("flags", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
-                                                             ("mode", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat"), (SELECT id FROM Datatype WHERE datatype="StructVariadic")),
+                                                             ("mode", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedVariadic")),
                                                              -- openat64
                                                              ("dirfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat64"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              ("pathname", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat64"), (SELECT id FROM Datatype WHERE datatype="String")),
                                                              ("flags", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat64"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
-                                                             ("mode", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat64"), (SELECT id FROM Datatype WHERE datatype="StructVariadic")),
+                                                             ("mode", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat64"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedVariadic")),
                                                              -- open_by_handle_at
                                                              ("mount_fd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open_by_handle_at"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              ("handle", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open_by_handle_at"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
@@ -125,23 +125,23 @@ INSERT INTO Argument (name, position, hook, datatype) VALUES -- Execution
                                                              -- accept
                                                              ("sockfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="accept"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              ("addr", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="accept"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
-                                                             ("addrlen", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="accept"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
+                                                             ("addrlen", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="accept"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedPointer")),
                                                              -- accept4
                                                              ("sockfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="accept4"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              ("addr", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="accept4"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
-                                                             ("addrlen", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="accept4"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
+                                                             ("addrlen", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="accept4"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedPointer")),
                                                              ("flags", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="accept4"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              -- bind
                                                              ("sockfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="bind"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              ("addr", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="bind"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
-                                                             ("addrlen", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="bind"), (SELECT id FROM Datatype WHERE datatype="Struct")),
+                                                             ("addrlen", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="bind"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
                                                              -- connect
                                                              ("sockfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="connect"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              ("addr", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="connect"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
-                                                             ("addrlen", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="connect"), (SELECT id FROM Datatype WHERE datatype="Struct"));
+                                                             ("addrlen", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="connect"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned"));
 
 -- Rule
--- TODO: OverrideFunction *exec* -> execve, add environment if not present and pass on to FilterEnvironment
+-- TODO: RedirectFunction *exec* -> execve, add environment if not present and pass on to FilterEnvironment
 -- TODO: exec*p*, fexecve: Rewrite path (for fexecve likely /proc/pid/fd/x)
 INSERT INTO Rule (arg, action) VALUES -- Execution
                                       ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execl") AND name="pathname"), (SELECT id FROM Action WHERE name="VerifyCanExecute")),
