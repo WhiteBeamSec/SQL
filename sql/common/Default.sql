@@ -33,7 +33,13 @@ INSERT INTO Setting (param, value) VALUES ("ConsoleSecret", "undefined"),
                                           ("SettingsModified", "-1");
 
 -- Action
-INSERT INTO Action (name) VALUES ("VerifyCanExecute"),("VerifyFileHash"),("FilterEnvironment"),("ConsumeVariadic");
+INSERT INTO Action (name) VALUES ("AddEnvironment"),
+                                 ("CanonicalizePath"),
+                                 ("ConsumeVariadic"),
+                                 ("FilterEnvironment"),
+                                 ("RedirectFunction"),
+                                 ("VerifyCanExecute"),
+                                 ("VerifyFileHash");
 
 -- HookClass
 INSERT INTO HookClass (class) VALUES ("Execution"),("Filesystem"),("Network"),("Certificate"),("Bruteforce"),("MemoryProtection");
