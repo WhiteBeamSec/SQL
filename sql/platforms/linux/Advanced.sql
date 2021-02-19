@@ -19,6 +19,7 @@ INSERT INTO Hook (symbol, library, enabled, language, class) VALUES -- TODO: Cer
 -- Argument
 INSERT INTO Argument (name, position, hook, datatype) VALUES -- TODO: Certificate
                                                              -- Bruteforce
+                                                             -- pam_authenticate
                                                              ("pamh", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libpam.so.0" AND symbol="pam_authenticate"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
                                                              ("flags", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libpam.so.0" AND symbol="pam_authenticate"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              -- MemoryProtection

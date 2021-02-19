@@ -108,6 +108,7 @@ CREATE INDEX ArgumentIndex ON Argument (parent);
 CREATE TABLE Rule (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   arg INTEGER NOT NULL,
+  positional INTEGER NOT NULL DEFAULT 1,
   action INTEGER NOT NULL,
   UNIQUE(arg, action),
   FOREIGN KEY (arg) REFERENCES Argument (id),
