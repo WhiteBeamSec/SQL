@@ -50,7 +50,7 @@ INSERT INTO HookLanguage (language) VALUES ("C"),("Java"),("PHP"),("Python"),("R
 -- Datatype: 32/64 bit determined with usize
 INSERT INTO Datatype (datatype, pointer, signed, variadic, array) VALUES ("String", 1, 0, 0, 0),
                                                                          ("StringArray", 1, 0, 0, 1),
-                                                                         ("StringVariadic", 0, 0, 1, 0),
+                                                                         ("StringVariadic", 1, 0, 1, 0),
                                                                          ("IntegerSigned", 0, 1, 0, 0),
                                                                          ("IntegerUnsigned", 0, 0, 0, 0),
                                                                          ("IntegerUnsignedPointer", 1, 0, 0, 0),
