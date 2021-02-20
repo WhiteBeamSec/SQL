@@ -163,6 +163,7 @@ CREATE VIEW RuleView AS
      SELECT Rule.arg,
             Action.name AS action
        FROM Rule
-       INNER JOIN Action ON Rule.action = Action.id;
+       INNER JOIN Action ON Rule.action = Action.id
+       ORDER BY Rule.id;
 
 COMMIT;
