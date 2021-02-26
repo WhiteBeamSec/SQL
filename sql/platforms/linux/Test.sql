@@ -9,10 +9,10 @@ INSERT INTO Log (class, desc, ts) VALUES ((SELECT id FROM LogClass WHERE class="
                                          ((SELECT id FROM LogClass WHERE class="General"), "Received request for public key from 172.16.0.2", strftime("%s", "now"));
 
 -- Whitelist: Libraries will go here too
-INSERT INTO Whitelist (path, value, class) VALUES ("/bin/bash", "3599edef28afa67b9bec983d57416d9a2cc33a166527c3f6ce2aabef96f66c52", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                                                  ("/bin/sh", "74704b4c3477ac155c2ca3ebbeb8f10db2badac161e331d006af5820f0acca7a", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+INSERT INTO Whitelist (path, value, class) VALUES ("/bin/bash", "900c28f35811948f08f1e9b0e357b18d3bd58c8f535c0f1fd66f16838c5b6fed", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                                                  ("/bin/sh", "81ead1a649fc4a85720ad69287c9c7557a787a6c590cbfffd9137b3d514164ee", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
                                                   ("/usr/sbin/apache2", "4aadc76a6af5d65197cb9cdf7d7a6945772539c48c0120919f38f77af29c0f53", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                                                  ("/usr/bin/whoami", "758fd29bc9160ab6e302be8c6dae03d2854cceaa5ed1aca525ab57a740a90645", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                                                  ("/usr/bin/whoami", "6d9bffe11b7c5520adb3f464a7d58c25d99ced49b881e163b7a8b09c94521897", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
                                                   ("/bin/bash", "/usr/sbin/apache2", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("/bin/sh", "/usr/sbin/apache2", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/usr/bin/whoami", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
