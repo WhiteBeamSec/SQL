@@ -31,7 +31,7 @@ INSERT INTO Setting (param, value) VALUES ("ConsoleSecret", "undefined"),
                                           ("ServerType", "undefined"),
                                           ("ServicePort", "11998"),
                                           ("SettingsModified", "-1"),
-                                          ("TransportAlgorithm", "XCHACHA20POLY1305");
+                                          ("EncryptAlgorithm", "XCHACHA20POLY1305");
 
 -- Action
 INSERT INTO Action (name) VALUES ("AddEnvironment"),
