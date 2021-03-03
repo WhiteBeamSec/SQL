@@ -56,6 +56,8 @@ INSERT INTO Datatype (datatype, pointer, signed, variadic, array) VALUES ("Strin
                                                                          ("IntegerUnsigned", 0, 0, 0, 0),
                                                                          ("IntegerUnsignedPointer", 1, 0, 0, 0),
                                                                          ("IntegerUnsignedVariadic", 0, 0, 1, 0),
+                                                                         ("LongSigned", 0, 1, 0, 0),
+                                                                         ("LongUnsigned", 0, 0, 0, 0),
                                                                          ("Struct", 0, 0, 0, 0),
                                                                          ("StructPointer", 1, 0, 0, 0);
 

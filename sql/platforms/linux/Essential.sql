@@ -39,6 +39,25 @@ INSERT INTO Hook (symbol, library, enabled, language, class) VALUES -- Execution
                                                                     ("openat", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
                                                                     ("openat64", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
                                                                     ("open_by_handle_at", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("chmod", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("fchmod", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("fchmodat", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("chown", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("lchown", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("fchown", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("fchownat", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("link", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("linkat", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("symlink", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("symlinkat", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("rename", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("renameat", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("renameat2", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("rmdir", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("unlink", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("unlinkat", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("truncate", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("ftruncate", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
                                                                     -- Network
                                                                     ("accept", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Network")),
                                                                     ("accept4", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Network")),
@@ -121,6 +140,79 @@ INSERT INTO Argument (name, position, hook, datatype) VALUES -- Execution
                                                              ("mount_fd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open_by_handle_at"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              ("handle", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open_by_handle_at"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
                                                              ("flags", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open_by_handle_at"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             -- chmod
+                                                             ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chmod"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("mode", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chmod"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             -- fchmod
+                                                             ("fd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchmod"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("mode", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchmod"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             -- fchmodat
+                                                             ("dirfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchmodat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("pathname", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchmodat"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("mode", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchmodat"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             ("flags", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchmodat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             -- chown
+                                                             ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chown"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("owner", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chown"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             ("group", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chown"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             -- lchown
+                                                             ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="lchown"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("owner", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="lchown"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             ("group", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="lchown"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             -- fchown
+                                                             ("fd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchown"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("owner", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchown"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             ("group", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchown"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             -- fchownat
+                                                             ("dirfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchownat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("pathname", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchownat"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("owner", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchownat"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             ("group", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchownat"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             ("flags", 4, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchownat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             -- link
+                                                             ("oldpath", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="link"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("newpath", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="link"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             -- linkat
+                                                             ("olddirfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="linkat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("oldpath", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="linkat"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("newdirfd", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="linkat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("newpath", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="linkat"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("flags", 4, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="linkat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             -- symlink
+                                                             ("target", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="symlink"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("linkpath", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="symlink"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             -- symlinkat
+                                                             ("target", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="symlinkat"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("newdirfd", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="symlinkat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("linkpath", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="symlinkat"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             -- rename
+                                                             ("oldpath", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="rename"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("newpath", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="rename"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             -- renameat
+                                                             ("olddirfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("oldpath", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("newdirfd", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("newpath", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             -- renameat2
+                                                             ("olddirfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat2"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("oldpath", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat2"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("newdirfd", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat2"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("newpath", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat2"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("flags", 4, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat2"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             -- rmdir
+                                                             ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="rmdir"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             -- unlink
+                                                             ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="unlink"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             -- unlinkat
+                                                             ("dirfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="unlinkat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("pathname", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="unlinkat"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("flags", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="unlinkat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             -- truncate
+                                                             ("path", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("length", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate"), (SELECT id FROM Datatype WHERE datatype="LongSigned")),
+                                                             -- ftruncate
+                                                             ("fd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="ftruncate"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("length", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="ftruncate"), (SELECT id FROM Datatype WHERE datatype="LongSigned")),
                                                              -- Network
                                                              -- accept
                                                              ("sockfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="accept"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
