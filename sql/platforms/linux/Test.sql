@@ -18,7 +18,7 @@ INSERT INTO Whitelist (path, value, class) VALUES ("/bin/bash", "664d9dd14597b83
                                                   ("/bin/bash", "/usr/sbin/apache2", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("/bin/sh", "/usr/sbin/apache2", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/usr/bin/whoami", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
-                                                  ("ANY", "/tmp/*", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Writable")), -- Realpath/canonicalized open() for wildcards?
+                                                  ("ANY", "/tmp/**", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")),
                                                   ("/usr/sbin/apache2", "172.16.0.0/12", (SELECT id FROM WhitelistClass WHERE class="Network/Range/CIDR"));
 
 -- NonceHistory
