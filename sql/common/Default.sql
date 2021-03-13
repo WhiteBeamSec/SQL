@@ -34,11 +34,15 @@ INSERT INTO Setting (param, value) VALUES ("ConsoleSecret", "undefined"),
 
 -- Action
 INSERT INTO Action (name) VALUES ("AddEnvironment"),
+                                 ("AddFlags"),
                                  ("CanonicalizePath"),
                                  ("ConsumeVariadic"),
                                  ("FilterEnvironment"),
+                                 ("OpenFileDescriptor"),
                                  ("RedirectFunction"),
+                                 ("SplitFileDescriptor"),
                                  ("VerifyCanExecute"),
+                                 ("VerifyCanWrite"),
                                  ("VerifyFileHash");
 
 -- HookClass
