@@ -41,7 +41,7 @@ INSERT INTO Action (name) VALUES ("AddEnvironment"),
                                  ("OpenAt"),
                                  ("OpenFileDescriptor"),
                                  ("RedirectFunction"),
-                                 ("SplitFileDescriptor"),
+                                 ("SplitFilePath"),
                                  ("VerifyCanExecute"),
                                  ("VerifyCanWrite"),
                                  ("VerifyFileHash");
