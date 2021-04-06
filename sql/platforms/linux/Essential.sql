@@ -4,7 +4,7 @@ BEGIN;
 Title: Essential
 Description: Minimum hooks, rules, and whitelist entries required to run and protect WhiteBeam
 Publisher: WhiteBeam Security, Inc.
-Version: 0.2 Alpha
+Version: 0.2 Beta
 */
 
 -- TODO Requiring race-free design:
@@ -18,12 +18,22 @@ Version: 0.2 Alpha
 --   mkdtemp
 --   mkstemp
 
--- Whitelist: Libraries will go here too
+-- Whitelist
 INSERT INTO Whitelist (path, value, class) VALUES ("ANY", "/bin/bash", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/bin/sh", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/usr/bin/bash", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/usr/bin/sh", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/opt/WhiteBeam/whitebeam", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
+                                                  ("ANY", "/lib/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  -- TODO: Architecture independent libraries
+                                                  ("ANY", "/lib/x86_64-linux-gnu/libc.so.6", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("ANY", "/lib/x86_64-linux-gnu/libgcc_s.so.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("ANY", "/lib/x86_64-linux-gnu/librt.so.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("ANY", "/lib/x86_64-linux-gnu/libpthread.so.0", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("ANY", "/lib/x86_64-linux-gnu/libm.so.6", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("ANY", "/lib/x86_64-linux-gnu/libdl.so.2", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("/opt/WhiteBeam/whitebeam", "/lib/x86_64-linux-gnu/libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("/opt/WhiteBeam/whitebeam", "/lib/x86_64-linux-gnu/libcrypto.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("/opt/WhiteBeam/whitebeam", "11998", (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port"));
 
 -- Hook
@@ -328,6 +338,20 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="symlink") AND name="linkpath"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="unlink") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknod") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
+                                                  -- Combine directory components in *at* functions to prevent directory traversal race conditions
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchmodat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchownat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="linkat") AND name="olddirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="linkat") AND name="newdirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat64") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat") AND name="olddirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat") AND name="newdirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat2") AND name="olddirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="renameat2") AND name="newdirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="symlinkat") AND name="newdirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="unlinkat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknodat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
                                                   -- Check if the target directory is whitelisted (if this is a write operation)
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chmod") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chown") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),

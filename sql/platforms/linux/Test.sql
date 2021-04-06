@@ -8,7 +8,7 @@ INSERT INTO Log (class, desc, ts) VALUES ((SELECT id FROM LogClass WHERE class="
                                          ((SELECT id FROM LogClass WHERE class="Auth"), "User nobody failed to authenticate to WhiteBeam", strftime("%s", "now")),
                                          ((SELECT id FROM LogClass WHERE class="General"), "Received request for public key from 172.16.0.2", strftime("%s", "now"));
 
--- Whitelist: Libraries will go here too
+-- Whitelist
 INSERT INTO Whitelist (path, value, class) VALUES ("/bin/bash", "664d9dd14597b83aebf765d2d054fa40ad7a93ffeca43ee3bba596517db2c39b", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
                                                   ("/bin/sh", "30751ae1ba8597ee7d9aa7e3852a58d9b21a14b88e423cbb0aa7d0512d059a6a", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
                                                   ("/usr/bin/bash", "664d9dd14597b83aebf765d2d054fa40ad7a93ffeca43ee3bba596517db2c39b", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
@@ -19,7 +19,8 @@ INSERT INTO Whitelist (path, value, class) VALUES ("/bin/bash", "664d9dd14597b83
                                                   ("/bin/sh", "/usr/sbin/apache2", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/usr/bin/whoami", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/tmp/**", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")),
-                                                  ("/usr/sbin/apache2", "172.16.0.0/12", (SELECT id FROM WhitelistClass WHERE class="Network/Range/CIDR"));
+                                                  ("/usr/sbin/apache2", "172.16.0.0/12", (SELECT id FROM WhitelistClass WHERE class="Network/Range/CIDR")),
+                                                  ("ANY", "/usr/src/whitebeam/target/release/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library"));
 
 -- NonceHistory
 INSERT INTO NonceHistory (nonce, ts) VALUES (lower(hex(randomblob(24))), 1590000000),
