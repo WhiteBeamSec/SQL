@@ -38,7 +38,9 @@ INSERT INTO Whitelist (path, value, class) VALUES ("ANY", "/bin/bash", (SELECT i
                                                   ("ANY", "/lib/x86_64-linux-gnu/libm.so.6", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("ANY", "libdl.so.2", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("ANY", "/lib/x86_64-linux-gnu/libdl.so.2", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("/opt/WhiteBeam/whitebeam", "libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("/opt/WhiteBeam/whitebeam", "/lib/x86_64-linux-gnu/libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("/opt/WhiteBeam/whitebeam", "libcrypto.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("/opt/WhiteBeam/whitebeam", "/lib/x86_64-linux-gnu/libcrypto.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("/opt/WhiteBeam/whitebeam", "11998", (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port"));
 
