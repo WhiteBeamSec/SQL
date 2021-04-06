@@ -24,8 +24,9 @@ INSERT INTO Whitelist (path, value, class) VALUES ("ANY", "/bin/bash", (SELECT i
                                                   ("ANY", "/usr/bin/bash", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/usr/bin/sh", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/opt/WhiteBeam/whitebeam", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
-                                                  ("ANY", "/lib/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   -- TODO: Architecture independent libraries
+                                                  ("ANY", "libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("ANY", "/lib/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("ANY", "libc.so.6", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("ANY", "/lib/x86_64-linux-gnu/libc.so.6", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("ANY", "libgcc_s.so.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
