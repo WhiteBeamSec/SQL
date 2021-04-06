@@ -21,7 +21,6 @@ INSERT INTO Whitelist (path, value, class) VALUES ("/bin/bash", "664d9dd14597b83
                                                   ("ANY", "/usr/bin/whoami", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/tmp/**", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")),
                                                   ("/usr/sbin/apache2", "172.16.0.0/12", (SELECT id FROM WhitelistClass WHERE class="Network/Range/CIDR")),
-                                                  ("ANY", "libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("ANY", "/usr/src/whitebeam/target/release/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("/usr/src/whitebeam/target/release/whitebeam", "libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("/usr/src/whitebeam/target/release/whitebeam", "/lib/x86_64-linux-gnu/libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
