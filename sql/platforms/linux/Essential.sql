@@ -56,6 +56,8 @@ INSERT INTO Hook (symbol, library, enabled, language, class) VALUES -- Execution
                                                                     ("execvp", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                                                                     ("execvpe", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                                                                     ("fexecve", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
+                                                                    ("dlopen", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
+                                                                    ("dlmopen", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                                                                     -- Filesystem
                                                                     ("creat", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
                                                                     ("creat64", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
@@ -125,6 +127,13 @@ INSERT INTO Argument (name, position, hook, datatype) VALUES -- Execution
                                                              ("fd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fexecve"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              ("argv", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fexecve"), (SELECT id FROM Datatype WHERE datatype="StringArray")),
                                                              ("envp", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fexecve"), (SELECT id FROM Datatype WHERE datatype="StringArray")),
+                                                             -- dlopen
+                                                             ("filename", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="dlopen"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("flags", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="dlopen"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             -- dlmopen
+                                                             ("lmid", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="dlmopen"), (SELECT id FROM Datatype WHERE datatype="LongSigned")),
+                                                             ("filename", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="dlmopen"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("flags", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="dlmopen"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              -- Filesystem
                                                              -- creat
                                                              ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="creat"), (SELECT id FROM Datatype WHERE datatype="String")),
@@ -270,10 +279,12 @@ INSERT INTO Argument (name, position, hook, datatype) VALUES -- Execution
 
 -- Rule
 INSERT INTO Rule (arg, positional, action) VALUES -- Execution
-                                                  -- Canonicalize path for exec*p*
+                                                  -- Canonicalize path for exec*p* and dl*open
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execlp") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="CanonicalizePath")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvp") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="CanonicalizePath")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvpe") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="CanonicalizePath")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="dlopen") AND name="filename"), TRUE, (SELECT id FROM Action WHERE name="CanonicalizePath")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="dlmopen") AND name="filename"), TRUE, (SELECT id FROM Action WHERE name="CanonicalizePath")),
                                                   -- Open file descriptor for the target executable
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execl") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="OpenFileDescriptor")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execle") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="OpenFileDescriptor")),
@@ -282,7 +293,7 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execve") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="OpenFileDescriptor")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvp") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="OpenFileDescriptor")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvpe") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="OpenFileDescriptor")),
-                                                  -- Check if the target is a whitelisted executable
+                                                  -- Check if the target is a whitelisted executable (TOCTOU protected by Filesystem hooks)
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execl") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanExecute")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execle") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanExecute")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execlp") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanExecute")),
@@ -291,6 +302,8 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvp") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanExecute")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvpe") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanExecute")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fexecve") AND name="fd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanExecute")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="dlopen") AND name="filename"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanExecute")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="dlmopen") AND name="filename"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanExecute")),
                                                   -- Check if the executable hash is whitelisted (TOCTOU protected by Filesystem hooks)
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execl") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="VerifyFileHash")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execle") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="VerifyFileHash")),
@@ -300,7 +313,7 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvp") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="VerifyFileHash")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvpe") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="VerifyFileHash")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fexecve") AND name="fd"), TRUE, (SELECT id FROM Action WHERE name="VerifyFileHash")),
-                                                  -- Convert variadic parameters into an array for execl*
+                                                  -- Convert execl* variadic parameters into an array
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execl") AND name="arg"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execle") AND name="arg"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execlp") AND name="arg"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
