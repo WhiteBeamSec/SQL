@@ -24,6 +24,8 @@ INSERT INTO Whitelist (path, value, class) VALUES ("ANY", "/bin/bash", (SELECT i
                                                   ("ANY", "/usr/bin/bash", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/usr/bin/sh", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/opt/WhiteBeam/whitebeam", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
+                                                  ("ANY", "/dev/pts/", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")),
+                                                  -- TODO: Restrict libraries below to specific applications
                                                   -- TODO: Architecture independent libraries
                                                   ("ANY", "libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("ANY", "/lib/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
@@ -422,7 +424,6 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="creat64") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="AddFlags")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="lchown") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="AddFlags")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="link") AND name="oldpath"), FALSE, (SELECT id FROM Action WHERE name="AddFlags")),
-                                                  --((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open64") AND name="flags"), TRUE, (SELECT id FROM Action WHERE name="AddFlags")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="rmdir") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="AddFlags")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="unlink") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="AddFlags")),
                                                   -- Redirect to TOCTOU safe function (*at/f*)
