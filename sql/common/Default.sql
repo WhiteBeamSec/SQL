@@ -13,13 +13,13 @@ INSERT INTO WhitelistClass (class) VALUES ("Hash/SHA3-256"),
                                           ("Certificate/PEM");
 
 -- LogClass: id is equal to the verbosity
-INSERT INTO LogClass (class) VALUES ("None"),("Error"),("Auth"),("General");
+INSERT INTO LogClass (class) VALUES ("Off"),("Error"),("Warn"),("Info"),("Debug"),("Trace");
 
 -- Setting
 INSERT INTO Setting (param, value) VALUES ("ConsoleSecret", "undefined"),
                                           ("ConsoleSecretExpiry", "-1"),
                                           ("HashAlgorithm", "BLAKE3"),
-                                          ("LogVerbosity", CAST((SELECT id FROM LogClass WHERE class="General") AS TEXT)),
+                                          ("LogVerbosity", CAST((SELECT id FROM LogClass WHERE class="Info") AS TEXT)),
                                           ("Prevention", "false"),
                                           ("RecoverySecret", "undefined"),
                                           ("Repository", "https://github.com/WhiteBeamSec/SQL/blob/master"),
