@@ -1,12 +1,12 @@
 BEGIN;
 
 -- Log
-INSERT INTO Log (class, desc, ts) VALUES ((SELECT id FROM LogClass WHERE class="Error"), "Fatal error in crypto.rs line 32: Unhandled exception", 1590000000),
-                                         ((SELECT id FROM LogClass WHERE class="Error"), "Fatal error in crypto.rs line 51: Unhandled exception", strftime("%s", "now")),
-                                         ((SELECT id FROM LogClass WHERE class="Warn"), "User root successfully authenticated to WhiteBeam", strftime("%s", "now")),
-                                         ((SELECT id FROM LogClass WHERE class="Warn"), "User root failed to authenticate to WhiteBeam", strftime("%s", "now")),
-                                         ((SELECT id FROM LogClass WHERE class="Warn"), "User nobody failed to authenticate to WhiteBeam", strftime("%s", "now")),
-                                         ((SELECT id FROM LogClass WHERE class="Info"), "Received request for public key from 172.16.0.2", strftime("%s", "now"));
+INSERT INTO Log (class, log, ts) VALUES ((SELECT id FROM LogClass WHERE class="Error"), "Fatal error in crypto.rs line 32: Unhandled exception", 1590000000),
+                                        ((SELECT id FROM LogClass WHERE class="Error"), "Fatal error in crypto.rs line 51: Unhandled exception", strftime("%s", "now")),
+                                        ((SELECT id FROM LogClass WHERE class="Warn"), "User root successfully authenticated to WhiteBeam", strftime("%s", "now")),
+                                        ((SELECT id FROM LogClass WHERE class="Warn"), "User root failed to authenticate to WhiteBeam", strftime("%s", "now")),
+                                        ((SELECT id FROM LogClass WHERE class="Warn"), "User nobody failed to authenticate to WhiteBeam", strftime("%s", "now")),
+                                        ((SELECT id FROM LogClass WHERE class="Info"), "Received request for public key from 172.16.0.2", strftime("%s", "now"));
 
 -- Whitelist
 INSERT INTO Whitelist (path, value, class) VALUES ("/bin/bash", "664d9dd14597b83aebf765d2d054fa40ad7a93ffeca43ee3bba596517db2c39b", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
