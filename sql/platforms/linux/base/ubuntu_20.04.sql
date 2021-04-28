@@ -171,7 +171,6 @@ INSERT INTO Whitelist (path, value, class) VALUES ('ANY','/bin/cat', (SELECT id 
                                                   ('/usr/bin/bash', 'ANY', (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
                                                   ('/usr/bin/bash','libtinfo.so.6', (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ('/usr/bin/bash','/lib/x86_64-linux-gnu/libtinfo.so.6', (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                                                  ('/usr/bin/bash','/root/', (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")),
                                                   ('/usr/bin/cat', 'ANY', (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
                                                   ('/usr/bin/clear_console', 'ANY', (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
                                                   ('/usr/bin/clear_console','libtinfo.so.6', (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
