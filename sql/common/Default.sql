@@ -45,6 +45,7 @@ INSERT INTO Action (name) VALUES ("AddEnvironment"),
                                  ("RedirectFunction"),
                                  ("SplitFilePath"),
                                  ("VerifyCanExecute"),
+                                 ("VerifyCanTerminate"),
                                  ("VerifyCanWrite"),
                                  ("VerifyFileHash");
 

@@ -4,7 +4,7 @@ BEGIN;
 Title: Essential
 Description: Minimum hooks, rules, and whitelist entries required to run and protect WhiteBeam
 Publisher: WhiteBeam Security, Inc.
-Version: 0.2 Beta
+Version: 0.2.1
 */
 
 -- TODO Requiring race-free design:
@@ -60,6 +60,7 @@ INSERT INTO Hook (symbol, library, enabled, language, class) VALUES -- Execution
                                                                     ("fexecve", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                                                                     ("dlopen", "/lib/x86_64-linux-gnu/libdl.so.2", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                                                                     ("dlmopen", "/lib/x86_64-linux-gnu/libdl.so.2", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
+                                                                    ("kill", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                                                                     -- Filesystem
                                                                     ("creat", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
                                                                     ("creat64", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
@@ -136,6 +137,9 @@ INSERT INTO Argument (name, position, hook, datatype) VALUES -- Execution
                                                              ("lmid", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libdl.so.2" AND symbol="dlmopen"), (SELECT id FROM Datatype WHERE datatype="LongSigned")),
                                                              ("filename", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libdl.so.2" AND symbol="dlmopen"), (SELECT id FROM Datatype WHERE datatype="String")),
                                                              ("flags", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libdl.so.2" AND symbol="dlmopen"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             -- kill
+                                                             ("pid", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="kill"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("sig", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="kill"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              -- Filesystem
                                                              -- creat
                                                              ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="creat"), (SELECT id FROM Datatype WHERE datatype="String")),
@@ -341,6 +345,8 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execve") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvp") AND name="file"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvpe") AND name="file"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
+                                                  -- Disallow killing the WhiteBeam service (TODO: pidfd_send_signal support for Linux >=5.1)
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="kill") AND name="pid"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanTerminate")),
                                                   -- Filesystem
                                                   -- Open file descriptor for the target path
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fopen") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="OpenFileDescriptor")),
