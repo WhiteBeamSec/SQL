@@ -4,7 +4,7 @@ BEGIN;
 Title: Essential
 Description: Minimum hooks, rules, and whitelist entries required to run and protect WhiteBeam
 Publisher: WhiteBeam Security, Inc.
-Version: 0.2.1
+Version: 0.2.2
 */
 
 -- TODO Requiring race-free design:
@@ -14,9 +14,14 @@ Version: 0.2.1
 --   freopen
 --   freopen64
 --   tmpfile
+--   tmpfile64
 --   mktemp
 --   mkdtemp
 --   mkstemp
+--   mkostemp64
+--   mkostemps64
+--   mkstemp64
+--   mkstemps64
 
 -- Whitelist
 INSERT INTO Whitelist (path, value, class) VALUES ("ANY", "/bin/bash", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
@@ -91,9 +96,19 @@ INSERT INTO Hook (symbol, library, enabled, language, class) VALUES -- Execution
                                                                     ("unlink", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
                                                                     ("unlinkat", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
                                                                     ("truncate", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("truncate64", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
                                                                     ("ftruncate", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("ftruncate64", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
                                                                     ("mknod", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
                                                                     ("mknodat", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("__open64_2", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("__open64", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("__openat64_2", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("__openat_2", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("__open_2", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("__open", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("__xmknod", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
+                                                                    ("__xmknodat", "/lib/x86_64-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
                                                                     -- Network
                                                                     ("accept", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Network")),
                                                                     ("accept4", "/lib/x86_64-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Network")),
@@ -252,9 +267,15 @@ INSERT INTO Argument (name, position, hook, datatype) VALUES -- Execution
                                                              -- truncate
                                                              ("path", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate"), (SELECT id FROM Datatype WHERE datatype="String")),
                                                              ("length", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate"), (SELECT id FROM Datatype WHERE datatype="LongSigned")),
+                                                             -- truncate64
+                                                             ("path", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate64"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("length", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate64"), (SELECT id FROM Datatype WHERE datatype="LongSigned")),
                                                              -- ftruncate
                                                              ("fd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="ftruncate"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                                                              ("length", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="ftruncate"), (SELECT id FROM Datatype WHERE datatype="LongSigned")),
+                                                             -- ftruncate64
+                                                             ("fd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="ftruncate64"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("length", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="ftruncate64"), (SELECT id FROM Datatype WHERE datatype="LongSigned")),
                                                              -- mknod
                                                              ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknod"), (SELECT id FROM Datatype WHERE datatype="String")),
                                                              ("mode", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknod"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
@@ -264,6 +285,43 @@ INSERT INTO Argument (name, position, hook, datatype) VALUES -- Execution
                                                              ("pathname", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknodat"), (SELECT id FROM Datatype WHERE datatype="String")),
                                                              ("mode", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknodat"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
                                                              ("dev", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknodat"), (SELECT id FROM Datatype WHERE datatype="LongUnsigned")),
+                                                             -- __open64_2
+                                                             ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64_2"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("flags", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64_2"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("mode", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64_2"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedVariadic")),
+                                                             -- __open64
+                                                             ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("flags", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("mode", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedVariadic")),
+                                                             -- __openat64_2
+                                                             ("dirfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat64_2"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("pathname", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat64_2"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("flags", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat64_2"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("mode", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat64_2"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedVariadic")),
+                                                             -- __openat_2
+                                                             ("dirfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat_2"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("pathname", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat_2"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("flags", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat_2"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("mode", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat_2"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedVariadic")),
+                                                             -- __open_2
+                                                             ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open_2"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("flags", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open_2"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("mode", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open_2"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedVariadic")),
+                                                             -- __open
+                                                             ("pathname", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("flags", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("mode", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsignedVariadic")),
+                                                             -- __xmknod
+                                                             ("ver", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknod"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("pathname", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknod"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("mode", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknod"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             ("dev", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknod"), (SELECT id FROM Datatype WHERE datatype="LongUnsigned")),
+                                                             -- __xmknodat
+                                                             ("ver", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknodat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("dirfd", 1, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknodat"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
+                                                             ("pathname", 2, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknodat"), (SELECT id FROM Datatype WHERE datatype="String")),
+                                                             ("mode", 3, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknodat"), (SELECT id FROM Datatype WHERE datatype="IntegerUnsigned")),
+                                                             ("dev", 4, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknodat"), (SELECT id FROM Datatype WHERE datatype="LongUnsigned")),
                                                              -- Network
                                                              -- accept
                                                              ("sockfd", 0, (SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="accept"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
@@ -352,6 +410,7 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fopen") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="OpenFileDescriptor")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fopen64") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="OpenFileDescriptor")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate") AND name="path"), TRUE, (SELECT id FROM Action WHERE name="OpenFileDescriptor")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate64") AND name="path"), TRUE, (SELECT id FROM Action WHERE name="OpenFileDescriptor")),
                                                   -- Open directory file descriptor
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chmod") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chown") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
@@ -368,6 +427,11 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="symlink") AND name="linkpath"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="unlink") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknod") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open_2") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64_2") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknod") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="SplitFilePath")),
                                                   -- Combine directory components in *at* functions to prevent directory traversal race conditions
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchmodat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchownat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
@@ -382,6 +446,9 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="symlinkat") AND name="newdirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="unlinkat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknodat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat_2") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat64_2") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknodat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="CombineDirectory")),
                                                   -- Check if the target directory is whitelisted (if this is a write operation)
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chmod") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chown") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
@@ -398,13 +465,20 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="symlink") AND name="linkpath"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="unlink") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknod") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open_2") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64_2") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknod") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate") AND name="path"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate64") AND name="path"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fopen") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fopen64") AND name="pathname"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchmod") AND name="fd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchown") AND name="fd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fdopen") AND name="fd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="ftruncate") AND name="fd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="ftruncate64") AND name="fd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchmodat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fchownat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="linkat") AND name="olddirfd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
@@ -418,11 +492,20 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="symlinkat") AND name="newdirfd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="unlinkat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknodat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat_2") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat64_2") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknodat") AND name="dirfd"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanWrite")),
                                                   -- Convert variadic parameters into regular parameters
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open") AND name="mode"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open64") AND name="mode"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat") AND name="mode"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="openat64") AND name="mode"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open") AND name="mode"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open_2") AND name="mode"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64") AND name="mode"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64_2") AND name="mode"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat_2") AND name="mode"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__openat64_2") AND name="mode"), TRUE, (SELECT id FROM Action WHERE name="ConsumeVariadic")),
                                                   -- Add open flags
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chmod") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="AddFlags")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="chown") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="AddFlags")),
@@ -447,7 +530,13 @@ INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="open64") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="mknod") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate") AND name="path"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="truncate64") AND name="path"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fopen") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
-                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fopen64") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction"));
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="fopen64") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open_2") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__open64_2") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction")),
+                                                  ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="__xmknod") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction"));
 
 COMMIT;
