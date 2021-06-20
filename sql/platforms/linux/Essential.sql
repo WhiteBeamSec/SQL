@@ -29,6 +29,7 @@ INSERT INTO Whitelist (path, value, class) VALUES ("ANY", "/bin/bash", (SELECT i
                                                   ("ANY", "/usr/bin/bash", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/usr/bin/sh", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/opt/WhiteBeam/whitebeam", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
+                                                  ("ANY", "/usr/local/bin/whitebeam", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/dev/pts/", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")),
                                                   -- TODO: Restrict libraries below to specific applications
                                                   -- TODO: Architecture independent libraries
@@ -50,7 +51,12 @@ INSERT INTO Whitelist (path, value, class) VALUES ("ANY", "/bin/bash", (SELECT i
                                                   ("/opt/WhiteBeam/whitebeam", "/lib/x86_64-linux-gnu/libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("/opt/WhiteBeam/whitebeam", "libcrypto.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("/opt/WhiteBeam/whitebeam", "/lib/x86_64-linux-gnu/libcrypto.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                                                  ("/opt/WhiteBeam/whitebeam", "11998", (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port"));
+                                                  ("/usr/local/bin/whitebeam", "libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("/usr/local/bin/whitebeam", "/lib/x86_64-linux-gnu/libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("/usr/local/bin/whitebeam", "libcrypto.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("/usr/local/bin/whitebeam", "/lib/x86_64-linux-gnu/libcrypto.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("/opt/WhiteBeam/whitebeam", "11998", (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port")),
+                                                  ("/usr/local/bin/whitebeam", "11998", (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port"));
 
 -- Hook
 -- TODO: Make sure this reflects the libraries present on a system
