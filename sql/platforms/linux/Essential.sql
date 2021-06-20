@@ -30,11 +30,14 @@ INSERT INTO Whitelist (path, value, class) VALUES ("ANY", "/bin/bash", (SELECT i
                                                   ("ANY", "/usr/bin/sh", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/opt/WhiteBeam/whitebeam", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                                                   ("ANY", "/usr/local/bin/whitebeam", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
+                                                  ("/opt/WhiteBeam/whitebeam", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                                                  ("/usr/local/bin/whitebeam", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
                                                   ("ANY", "/dev/pts/", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")),
                                                   -- TODO: Restrict libraries below to specific applications
                                                   -- TODO: Architecture independent libraries
                                                   ("ANY", "libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("ANY", "/lib/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                                                  ("ANY", "/opt/WhiteBeam/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("ANY", "libc.so.6", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("ANY", "/lib/x86_64-linux-gnu/libc.so.6", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
                                                   ("ANY", "libgcc_s.so.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
