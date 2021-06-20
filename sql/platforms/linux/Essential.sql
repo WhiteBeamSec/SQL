@@ -353,6 +353,7 @@ INSERT INTO Argument (name, position, hook, datatype) VALUES -- Execution
 -- Rule
 INSERT INTO Rule (arg, positional, action) VALUES -- Execution
                                                   -- Canonicalize path for exec*p* and dl*open
+                                                  -- TODO: Should the path in all exec* hooks be canonicalized here to reduce the size of the whitelist?
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execlp") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="CanonicalizePath")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvp") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="CanonicalizePath")),
                                                   ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/x86_64-linux-gnu/libc.so.6" AND symbol="execvpe") AND name="file"), TRUE, (SELECT id FROM Action WHERE name="CanonicalizePath")),
