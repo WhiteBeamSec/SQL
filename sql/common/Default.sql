@@ -18,6 +18,7 @@ INSERT INTO LogClass (class) VALUES ("Off"),("Error"),("Warn"),("Info"),("Debug"
 -- Setting
 INSERT INTO Setting (param, value) VALUES ("ConsoleSecret", "undefined"),
                                           ("ConsoleSecretExpiry", "-1"),
+                                          ("EncryptAlgorithm", "XCHACHA20POLY1305"),
                                           ("HashAlgorithm", "BLAKE3"),
                                           ("LogVerbosity", CAST((SELECT id FROM LogClass WHERE class="Info") AS TEXT)),
                                           ("Prevention", "false"),
@@ -31,7 +32,7 @@ INSERT INTO Setting (param, value) VALUES ("ConsoleSecret", "undefined"),
                                           ("ServerType", "undefined"),
                                           ("ServicePort", "11998"),
                                           ("SettingsModified", "-1"),
-                                          ("EncryptAlgorithm", "XCHACHA20POLY1305");
+                                          ("SystemArchitecture", "undefined");
 
 -- Action
 INSERT INTO Action (name) VALUES ("AddEnvironment"),
