@@ -37,6 +37,13 @@ CREATE TABLE Action (
   UNIQUE(name)
 );
 
+CREATE TABLE ActionArgument (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  value TEXT NOT NULL,
+  next INTEGER,
+  FOREIGN KEY (next) REFERENCES ActionArgument (id)
+);
+
 CREATE TABLE Setting (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   param TEXT NOT NULL,
@@ -110,9 +117,10 @@ CREATE TABLE Rule (
   arg INTEGER NOT NULL,
   positional INTEGER NOT NULL DEFAULT 1,
   action INTEGER NOT NULL,
-  UNIQUE(arg, action),
+  actionarg INTEGER,
   FOREIGN KEY (arg) REFERENCES Argument (id),
-  FOREIGN KEY (action) REFERENCES Action (id)
+  FOREIGN KEY (action) REFERENCES Action (id),
+  FOREIGN KEY (actionarg) REFERENCES ActionArgument (id)
 );
 
 CREATE TRIGGER RotateLog AFTER INSERT ON Log
@@ -161,7 +169,8 @@ CREATE VIEW WhitelistView AS
 
 CREATE VIEW RuleView AS
      SELECT Rule.arg,
-            Action.name AS action
+            Action.name AS action,
+            Rule.actionarg
        FROM Rule
        INNER JOIN Action ON Rule.action = Action.id
        ORDER BY Rule.id;
