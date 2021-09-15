@@ -2,18 +2,16 @@ BEGIN;
 
 -- TODO: Text table for distinguishing Essential/Base/etc.?
 
-CREATE TABLE LogClass (
+CREATE TABLE LogFacility (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  class TEXT NOT NULL,
-  UNIQUE(class)
+  facility TEXT NOT NULL,
+  UNIQUE(facility)
 );
 
-CREATE TABLE Log (
+CREATE TABLE LogSeverity (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  class INTEGER NOT NULL,
-  log TEXT,
-  ts INTEGER NOT NULL,
-  FOREIGN KEY (class) REFERENCES LogClass (id)
+  severity TEXT NOT NULL,
+  UNIQUE(severity)
 );
 
 CREATE TABLE WhitelistClass (
@@ -122,12 +120,6 @@ CREATE TABLE Rule (
   FOREIGN KEY (action) REFERENCES Action (id),
   FOREIGN KEY (actionarg) REFERENCES ActionArgument (id)
 );
-
-CREATE TRIGGER RotateLog AFTER INSERT ON Log
-  BEGIN
-    -- Rotate logs
-    DELETE FROM Log WHERE ts=(SELECT min(ts) FROM Log) AND (SELECT count(*) FROM Log)=CAST((SELECT value FROM Setting WHERE param='RotateLogLimit') AS INTEGER);
-  END;
 
 CREATE TRIGGER RotateNonceHistory AFTER INSERT ON NonceHistory
   BEGIN

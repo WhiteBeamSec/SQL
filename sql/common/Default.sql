@@ -12,19 +12,41 @@ INSERT INTO WhitelistClass (class) VALUES ("Hash/SHA3-256"),
                                           ("Certificate/DER"),
                                           ("Certificate/PEM");
 
--- LogClass: id is equal to the verbosity
-INSERT INTO LogClass (class) VALUES ("Off"),("Error"),("Warn"),("Info"),("Debug"),("Trace");
+-- LogFacility: id is equal to the facility
+INSERT INTO LogFacility (id, facility) VALUES (0, "Kernel"),
+                                              (1, "User"),
+                                              (2, "Mail"),
+                                              (3, "Daemon"),
+                                              (4, "Auth"),
+                                              (5, "Syslog"),
+                                              (6, "LPR"),
+                                              (7, "News"),
+                                              (8, "UUCP"),
+                                              (9, "Cron"),
+                                              (10, "AuthPriv"),
+                                              (11, "FTP"),
+                                              (16, "Local0"),
+                                              (17, "Local1"),
+                                              (18, "Local2"),
+                                              (19, "Local3"),
+                                              (20, "Local4"),
+                                              (21, "Local5"),
+                                              (22, "Local6"),
+                                              (23, "Local7");
+
+-- LogSeverity: id is equal to the severity
+INSERT INTO LogSeverity (severity) VALUES ("Emergency"),("Alert"),("Critical"),("Error"),("Warning"),("Notice"),("Info"),("Debug");
 
 -- Setting
 INSERT INTO Setting (param, value) VALUES ("ConsoleSecret", "undefined"),
                                           ("ConsoleSecretExpiry", "-1"),
                                           ("EncryptAlgorithm", "XCHACHA20POLY1305"),
                                           ("HashAlgorithm", "BLAKE3"),
-                                          ("LogVerbosity", CAST((SELECT id FROM LogClass WHERE class="Info") AS TEXT)),
+                                          ("LogFacility", CAST((SELECT id FROM LogFacility WHERE facility="Local0") AS TEXT)),
+                                          ("LogSeverity", CAST((SELECT id FROM LogSeverity WHERE severity="Notice") AS TEXT)),
                                           ("Prevention", "false"),
                                           ("RecoverySecret", "undefined"),
                                           ("Repository", "https://github.com/WhiteBeamSec/SQL/blob/master"),
-                                          ("RotateLogLimit", "10000"),
                                           ("RotateNonceLimit", "3600"),
                                           ("SecretAlgorithm", "ARGON2ID"),
                                           ("ServerIP", "undefined"),
