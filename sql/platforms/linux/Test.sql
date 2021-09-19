@@ -1,13 +1,5 @@
 BEGIN;
 
--- Log
-INSERT INTO Log (class, log, ts) VALUES ((SELECT id FROM LogClass WHERE class="Error"), "Fatal error in crypto.rs line 32: Unhandled exception", 1590000000),
-                                        ((SELECT id FROM LogClass WHERE class="Error"), "Fatal error in crypto.rs line 51: Unhandled exception", strftime("%s", "now")),
-                                        ((SELECT id FROM LogClass WHERE class="Warn"), "User root successfully authenticated to WhiteBeam", strftime("%s", "now")),
-                                        ((SELECT id FROM LogClass WHERE class="Warn"), "User root failed to authenticate to WhiteBeam", strftime("%s", "now")),
-                                        ((SELECT id FROM LogClass WHERE class="Warn"), "User nobody failed to authenticate to WhiteBeam", strftime("%s", "now")),
-                                        ((SELECT id FROM LogClass WHERE class="Info"), "Received request for public key from 172.16.0.2", strftime("%s", "now"));
-
 -- Whitelist
 INSERT INTO Whitelist (path, value, class)
 WITH const (arch) AS (SELECT value FROM Setting WHERE param="SystemArchitecture")
