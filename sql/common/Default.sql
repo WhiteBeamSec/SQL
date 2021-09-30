@@ -75,10 +75,10 @@ INSERT INTO Action (name) VALUES ("AddEnvironment"),
                                  ("VerifyFileHash");
 
 -- HookClass
-INSERT INTO HookClass (class) VALUES ("Execution"),("Filesystem"),("Network"),("Certificate"),("Bruteforce"),("MemoryProtection");
+INSERT INTO HookClass (class) VALUES ("Execution"),("Filesystem"),("Network"),("Certificate"),("Bruteforce"),("MemoryProtection"),("Patch");
 
 -- HookLanguage
-INSERT INTO HookLanguage (language) VALUES ("C"),("Java"),("PHP"),("Python"),("Ruby");
+INSERT INTO HookLanguage (language) VALUES ("C"),("C++"),("Java"),("PHP"),("Python"),("Ruby");
 
 -- Datatype: 32/64 bit determined with usize
 INSERT INTO Datatype (datatype, pointer, signed, variadic, array) VALUES ("String", 1, 0, 0, 0),

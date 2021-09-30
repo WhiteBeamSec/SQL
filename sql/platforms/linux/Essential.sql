@@ -22,6 +22,7 @@ Version: 0.2.4
 --   mkostemps64
 --   mkstemp64
 --   mkstemps64
+-- TODO: Dynamically mangle/demangle C++ symbols
 
 -- Whitelist
 INSERT INTO Whitelist (path, value, class)
