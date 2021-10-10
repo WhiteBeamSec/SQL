@@ -4,7 +4,7 @@ BEGIN;
 Title: Essential
 Description: Minimum hooks, rules, and whitelist entries required to run and protect WhiteBeam
 Publisher: WhiteBeam Security, Inc.
-Version: 0.2.4
+Version: 0.2.5
 */
 
 -- TODO Requiring race-free design:
@@ -66,7 +66,7 @@ SELECT * FROM (VALUES -- Execution
                       ("execvpe", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                       ("fexecve", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                       ("dlopen", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
-                      ("dlmopen", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
+                      ("dlmopen", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                       ("kill", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                       -- Filesystem
                       ("creat", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Filesystem")),
@@ -357,8 +357,13 @@ SELECT * FROM (VALUES -- Execution
 -- ActionArgument
 INSERT INTO ActionArgument (value, next)
 WITH const (arch) AS (SELECT value FROM Setting WHERE param="SystemArchitecture")
-SELECT * FROM (VALUES -- RedirectFunction
+SELECT * FROM (VALUES -- AddInt
+                      -- ModifyInt
+                      ("0", NULL), ("0", last_insert_rowid()), -- LM_ID_BASE
+                      ("1", NULL), ("2", last_insert_rowid()), -- RTLD_LAZY
+                      -- RedirectFunction
                       ("execve", NULL), ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", last_insert_rowid()),
+                      ("dlmopen", NULL), ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2", last_insert_rowid()),
                       ("ftruncate", NULL), ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", last_insert_rowid()),
                       ("ftruncate64", NULL), ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", last_insert_rowid()),
                       ("fdopen", NULL), ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", last_insert_rowid()),
@@ -416,6 +421,12 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="execlp") AND name="file"), FALSE, (SELECT id FROM Action WHERE name="AddEnvironment"), NULL),
                       ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="execv") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="AddEnvironment"), NULL),
                       ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="execvp") AND name="file"), FALSE, (SELECT id FROM Action WHERE name="AddEnvironment"), NULL),
+                      -- Add flags to dlopen
+                      ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2" AND symbol="dlopen") AND name="filename"), FALSE, (SELECT id FROM Action WHERE name="AddInt"), NULL),
+                      -- Modify flags of dlopen and dlmopen
+                      ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2" AND symbol="dlopen") AND name="filename"), FALSE, (SELECT id FROM Action WHERE name="ModifyInt"), (SELECT id FROM ActionArgument WHERE value="2" AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2" AND symbol="dlmopen") AND name="lmid"), TRUE, (SELECT id FROM Action WHERE name="ModifyInt"), (SELECT id FROM ActionArgument WHERE value="0" AND next=(SELECT id FROM ActionArgument WHERE value="0" AND next IS NULL))),
+                      ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2" AND symbol="dlmopen") AND name="flags"), TRUE, (SELECT id FROM Action WHERE name="ModifyInt"), (SELECT id FROM ActionArgument WHERE value="2" AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
                       -- Filter environment parameter
                       ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="execl") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="FilterEnvironment"), NULL),
                       ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="execle") AND name="envp"), TRUE, (SELECT id FROM Action WHERE name="FilterEnvironment"), NULL),
@@ -432,6 +443,8 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="execv") AND name="pathname"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction"), (SELECT id FROM ActionArgument WHERE value=("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6") AND next=(SELECT id FROM ActionArgument WHERE value="execve" AND next IS NULL))),
                       ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="execvp") AND name="file"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction"), (SELECT id FROM ActionArgument WHERE value=("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6") AND next=(SELECT id FROM ActionArgument WHERE value="execve" AND next IS NULL))),
                       ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="execvpe") AND name="file"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction"), (SELECT id FROM ActionArgument WHERE value=("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6") AND next=(SELECT id FROM ActionArgument WHERE value="execve" AND next IS NULL))),
+                      -- Redirect dlopen to dlmopen
+                      ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2" AND symbol="dlopen") AND name="filename"), FALSE, (SELECT id FROM Action WHERE name="RedirectFunction"), (SELECT id FROM ActionArgument WHERE value=("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2") AND next=(SELECT id FROM ActionArgument WHERE value="dlmopen" AND next IS NULL))),
                       -- Disallow killing the WhiteBeam service (TODO: pidfd_send_signal support for Linux >=5.1)
                       ((SELECT id FROM Argument WHERE hook=(SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="kill") AND name="pid"), TRUE, (SELECT id FROM Action WHERE name="VerifyCanTerminate"), NULL),
                       -- Filesystem

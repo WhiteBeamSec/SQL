@@ -4,7 +4,7 @@ BEGIN;
 Title: Advanced
 Description: Hooks and rules to protect against advanced attacks
 Publisher: WhiteBeam Security, Inc.
-Version: 0.2.4
+Version: 0.2.5
 */
 
 -- TODO: mkfifo*?
