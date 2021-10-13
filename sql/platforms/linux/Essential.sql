@@ -4,7 +4,7 @@ BEGIN;
 Title: Essential
 Description: Minimum hooks, rules, and whitelist entries required to run and protect WhiteBeam
 Publisher: WhiteBeam Security, Inc.
-Version: 0.2.5
+Version: 0.2.6
 */
 
 -- TODO Requiring race-free design:
