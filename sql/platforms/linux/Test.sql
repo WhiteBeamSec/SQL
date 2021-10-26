@@ -1,5 +1,12 @@
 BEGIN;
 
+/*
+Title: Test
+Description: Sample WhiteBeam data
+Publisher: WhiteBeam Security, Inc.
+Version: 0.2.6
+*/
+
 -- Whitelist
 INSERT INTO Whitelist (path, value, class)
 WITH const (arch) AS (SELECT value FROM Setting WHERE param="SystemArchitecture")
