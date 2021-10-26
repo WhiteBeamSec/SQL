@@ -7,7 +7,7 @@ Publisher: WhiteBeam Security, Inc.
 Version: 0.2.6
 */
 
-INSERT INTO Whitelist (path, value, class)
+INSERT OR IGNORE INTO Whitelist (path, value, class)
 WITH const (arch) AS (SELECT value FROM Setting WHERE param="SystemArchitecture")
 SELECT * FROM (VALUES ("/bin/bash", "/usr/bin/dircolors", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
                       ("/bin/bash", "/usr/bin/lesspipe", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
