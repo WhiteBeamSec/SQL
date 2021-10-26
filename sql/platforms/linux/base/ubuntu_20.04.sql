@@ -1,3 +1,12 @@
+BEGIN;
+
+/*
+Title: Ubuntu 20.04
+Description: Base whitelist for Ubuntu 20.04 LTS
+Publisher: WhiteBeam Security, Inc.
+Version: 0.2.6
+*/
+
 INSERT INTO Whitelist (path, value, class)
 WITH const (arch) AS (SELECT value FROM Setting WHERE param="SystemArchitecture")
 SELECT * FROM (VALUES ("/bin/bash", "/usr/bin/dircolors", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
@@ -2174,3 +2183,5 @@ SELECT * FROM (VALUES ("/bin/bash", "/usr/bin/dircolors", (SELECT id FROM Whitel
                       ("/usr/sbin/cron", "/run/", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")),
                       ("/usr/sbin/logrotate", "/var/lib/logrotate/", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")),
                       ("/usr/sbin/logrotate", "/var/log/", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")));
+
+COMMIT;
