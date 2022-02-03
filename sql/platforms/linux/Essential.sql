@@ -4,7 +4,7 @@ BEGIN;
 Title: Essential
 Description: Minimum hooks, rules, and whitelist entries required to run and protect WhiteBeam
 Publisher: WhiteBeam Security, Inc.
-Version: 0.2.6
+Version: 0.3.0-dev
 */
 
 -- TODO Requiring race-free design:
@@ -25,43 +25,43 @@ Version: 0.2.6
 -- TODO: Dynamically mangle/demangle C++ symbols
 
 -- Whitelist
-INSERT INTO Whitelist (path, value, class)
+INSERT INTO Whitelist (parent, path, value, class)
 WITH const (arch) AS (SELECT value FROM Setting WHERE param="SystemArchitecture")
-SELECT * FROM (VALUES ("ANY", "/bin/bash", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
-                      ("ANY", "/bin/sh", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
-                      ("ANY", "/usr/bin/bash", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
-                      ("ANY", "/usr/bin/sh", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
-                      ("ANY", "/opt/WhiteBeam/whitebeam", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
-                      ("ANY", "/usr/local/bin/whitebeam", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
-                      ("ANY", "/lib/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                      ("ANY", "/opt/WhiteBeam/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libgcc_s.so.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libpthread.so.0", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libm.so.6", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                      ("/opt/WhiteBeam/whitebeam", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                      ("/opt/WhiteBeam/whitebeam", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libcrypto.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                      ("/usr/local/bin/whitebeam", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                      ("/usr/local/bin/whitebeam", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libcrypto.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
-                      ("/bin/bash", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/bin/sh", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/usr/bin/bash", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/usr/bin/sh", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/opt/WhiteBeam/whitebeam", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/usr/local/bin/whitebeam", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/lib/libwhitebeam.so", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/opt/WhiteBeam/libwhitebeam.so", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libgcc_s.so.1", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libpthread.so.0", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libm.so.6", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libssl.so.1.1", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libcrypto.so.1.1", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
-                      ("ANY", "/dev/pts/", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")),
-                      ("/opt/WhiteBeam/whitebeam", "11998", (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port")),
-                      ("/usr/local/bin/whitebeam", "11998", (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port")));
+SELECT * FROM (VALUES ("ANY", "ANY", "/bin/bash", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
+                      ("ANY", "ANY", "/bin/sh", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
+                      ("ANY", "ANY", "/usr/bin/bash", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
+                      ("ANY", "ANY", "/usr/bin/sh", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
+                      ("ANY", "ANY", "/opt/WhiteBeam/whitebeam", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
+                      ("ANY", "ANY", "/usr/local/bin/whitebeam", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable")),
+                      ("ANY", "ANY", "/lib/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                      ("ANY", "ANY", "/opt/WhiteBeam/libwhitebeam.so", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                      ("ANY", "ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                      ("ANY", "ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libgcc_s.so.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                      ("ANY", "ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libpthread.so.0", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                      ("ANY", "ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libm.so.6", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                      ("ANY", "ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                      ("ANY", "/opt/WhiteBeam/whitebeam", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                      ("ANY", "/opt/WhiteBeam/whitebeam", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libcrypto.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                      ("ANY", "/usr/local/bin/whitebeam", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libssl.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                      ("ANY", "/usr/local/bin/whitebeam", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libcrypto.so.1.1", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library")),
+                      ("ANY", "/bin/bash", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/bin/sh", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/usr/bin/bash", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/usr/bin/sh", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/opt/WhiteBeam/whitebeam", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/usr/local/bin/whitebeam", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/lib/libwhitebeam.so", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/opt/WhiteBeam/libwhitebeam.so", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libgcc_s.so.1", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libpthread.so.0", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libm.so.6", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libssl.so.1.1", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libcrypto.so.1.1", "ANY", (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3")),
+                      ("ANY", "ANY", "/dev/pts/", (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable")),
+                      ("ANY", "/opt/WhiteBeam/whitebeam", "11998", (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port")),
+                      ("ANY", "/usr/local/bin/whitebeam", "11998", (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port")));
 
 -- Hook
 -- TODO: Make sure this reflects the libraries present on a system

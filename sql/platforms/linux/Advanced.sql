@@ -4,11 +4,11 @@ BEGIN;
 Title: Advanced
 Description: Hooks and rules to protect against advanced attacks
 Publisher: WhiteBeam Security, Inc.
-Version: 0.2.6
+Version: 0.3.0-dev
 */
 
 -- TODO: mkfifo*?
--- TODO 0.3.0: RedirectFunction all MemoryProtection functions to FORTIFY_SOURCE equivalents?
+-- TODO 0.4.0: RedirectFunction all MemoryProtection functions to FORTIFY_SOURCE equivalents?
 
 -- Hook
 INSERT INTO Hook (symbol, library, enabled, language, class)

@@ -22,10 +22,11 @@ CREATE TABLE WhitelistClass (
 
 CREATE TABLE Whitelist (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  parent TEXT NOT NULL,
   path TEXT NOT NULL,
   value TEXT NOT NULL,
   class INTEGER NOT NULL,
-  UNIQUE(path, value, class),
+  UNIQUE(parent, path, value, class),
   FOREIGN KEY (class) REFERENCES WhitelistClass (id)
 );
 
@@ -154,6 +155,7 @@ CREATE VIEW ArgumentView AS
 
 CREATE VIEW WhitelistView AS
      SELECT WhitelistClass.class,
+            Whitelist.parent,
             Whitelist.path,
             Whitelist.value
        FROM Whitelist
