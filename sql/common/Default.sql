@@ -85,6 +85,7 @@ INSERT INTO Datatype (datatype, pointer, signed, variadic, array) VALUES ("Strin
                                                                          ("StringArray", 1, 0, 0, 1),
                                                                          ("StringVariadic", 1, 0, 1, 0),
                                                                          ("IntegerSigned", 0, 1, 0, 0),
+                                                                         ("IntegerSignedPointer", 1, 1, 0, 0),
                                                                          ("IntegerUnsigned", 0, 0, 0, 0),
                                                                          ("IntegerUnsignedPointer", 1, 0, 0, 0),
                                                                          ("IntegerUnsignedVariadic", 0, 0, 1, 0),

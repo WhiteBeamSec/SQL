@@ -8,8 +8,6 @@ Version: 0.3.0-dev
 */
 
 -- TODO Requiring race-free design:
--- Execution
---   posix_spawn
 -- Filesystem
 --   freopen
 --   freopen64
@@ -66,7 +64,7 @@ SELECT * FROM (VALUES ("ANY", "ANY", "/bin/bash", (SELECT id FROM WhitelistClass
 -- Hook
 -- TODO: Make sure this reflects the libraries present on a system
 -- TODO: Enable all hooks for complete coverage.
---       For now, do not report security issues unless all 53 Execution and Filesystem hooks are enabled (currently this comes at some stability costs).
+--       For now, do not report security issues unless all Execution and Filesystem hooks are enabled (currently this comes at some stability costs).
 INSERT INTO Hook (symbol, library, enabled, language, class)
 WITH const (arch) AS (SELECT value FROM Setting WHERE param="SystemArchitecture")
 SELECT * FROM (VALUES -- Execution
@@ -78,6 +76,8 @@ SELECT * FROM (VALUES -- Execution
                       ("execvp", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                       ("execvpe", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                       ("fexecve", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
+                      ("posix_spawn", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
+                      ("posix_spawnp", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", 1, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                       ("dlopen", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                       ("dlmopen", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
                       ("kill", "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6", 0, (SELECT id FROM HookLanguage WHERE language="C"), (SELECT id FROM HookClass WHERE class="Execution")),
@@ -164,6 +164,20 @@ SELECT * FROM (VALUES -- Execution
                       ("fd", 0, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="fexecve"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
                       ("argv", 1, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="fexecve"), (SELECT id FROM Datatype WHERE datatype="StringArray")),
                       ("envp", 2, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="fexecve"), (SELECT id FROM Datatype WHERE datatype="StringArray")),
+                      -- posix_spawn
+                      ("pid", 0, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawn"), (SELECT id FROM Datatype WHERE datatype="IntegerSignedPointer")),
+                      ("path", 1, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawn"), (SELECT id FROM Datatype WHERE datatype="String")),
+                      ("file_actions", 2, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawn"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
+                      ("attrp", 3, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawn"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
+                      ("argv", 4, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawn"), (SELECT id FROM Datatype WHERE datatype="StringArray")),
+                      ("envp", 5, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawn"), (SELECT id FROM Datatype WHERE datatype="StringArray")),
+                      -- posix_spawnp
+                      ("pid", 0, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawnp"), (SELECT id FROM Datatype WHERE datatype="IntegerSignedPointer")),
+                      ("file", 1, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawnp"), (SELECT id FROM Datatype WHERE datatype="String")),
+                      ("file_actions", 2, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawnp"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
+                      ("attrp", 3, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawnp"), (SELECT id FROM Datatype WHERE datatype="StructPointer")),
+                      ("argv", 4, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawnp"), (SELECT id FROM Datatype WHERE datatype="StringArray")),
+                      ("envp", 5, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libc.so.6" AND symbol="posix_spawnp"), (SELECT id FROM Datatype WHERE datatype="StringArray")),
                       -- dlopen
                       ("filename", 0, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2" AND symbol="dlopen"), (SELECT id FROM Datatype WHERE datatype="String")),
                       ("flags", 1, (SELECT id FROM Hook WHERE library = "/lib/" || (SELECT const.arch FROM const) || "-linux-gnu/libdl.so.2" AND symbol="dlopen"), (SELECT id FROM Datatype WHERE datatype="IntegerSigned")),
