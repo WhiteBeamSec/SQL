@@ -98,13 +98,12 @@ CREATE TABLE Datatype (
 CREATE TABLE Argument (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name TEXT NOT NULL,
-  parent INTEGER NOT NULL DEFAULT 0,
+  parent INTEGER NOT NULL DEFAULT 0, -- REFERENCES Argument (id)
   position INTEGER NOT NULL,
   hook INTEGER NOT NULL,
   datatype INTEGER NOT NULL,
   UNIQUE(name, parent, hook),
   UNIQUE(position, parent, hook),
-  FOREIGN KEY (parent) REFERENCES Argument (id),
   FOREIGN KEY (hook) REFERENCES Hook (id),
   FOREIGN KEY (datatype) REFERENCES Datatype (id)
 );
