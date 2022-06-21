@@ -112,11 +112,11 @@ CREATE INDEX ArgumentIndex ON Argument (parent);
 
 CREATE TABLE Rule (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  arg INTEGER NOT NULL,
-  positional INTEGER NOT NULL DEFAULT 1,
+  hook INTEGER NOT NULL,
+  position INTEGER,
   action INTEGER NOT NULL,
   actionarg INTEGER,
-  FOREIGN KEY (arg) REFERENCES Argument (id),
+  FOREIGN KEY (hook) REFERENCES Hook (id),
   FOREIGN KEY (action) REFERENCES Action (id),
   FOREIGN KEY (actionarg) REFERENCES ActionArgument (id)
 );
