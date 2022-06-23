@@ -161,9 +161,10 @@ CREATE VIEW WhitelistView AS
        INNER JOIN WhitelistClass ON Whitelist.class = WhitelistClass.id;
 
 CREATE VIEW RuleView AS
-     SELECT Rule.arg,
+     SELECT Rule.hook,
             Action.name AS action,
-            Rule.actionarg
+            Rule.actionarg,
+            Rule.position
        FROM Rule
        INNER JOIN Action ON Rule.action = Action.id
        ORDER BY Rule.id;
