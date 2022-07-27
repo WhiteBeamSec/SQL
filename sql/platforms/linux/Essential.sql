@@ -90,9 +90,9 @@ SELECT * FROM (VALUES -- Execution
                       ("fexecve", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       ("posix_spawn", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       ("posix_spawnp", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
-                      ("dlopen", (SELECT libdl FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
-                      ("dlmopen", (SELECT libdl FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
-                      ("kill", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
+                      ("dlopen", (SELECT libdl FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
+                      ("dlmopen", (SELECT libdl FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
+                      ("kill", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       -- Filesystem
                       ("creat", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("creat64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
