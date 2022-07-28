@@ -413,7 +413,6 @@ WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.
 SELECT * FROM (VALUES -- AddInt
                       -- ModifyInt
                       ("0", NULL), -- LM_ID_BASE
-                      ("1", NULL), -- RTLD_LAZY
                       -- RedirectFunction
                       ("execve", NULL), ((SELECT libc FROM local_const), last_insert_rowid()),
                       ("posix_spawn", NULL), ((SELECT libc FROM local_const), last_insert_rowid()),
@@ -498,10 +497,8 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="execvp"), 2, (SELECT AddEnvironment FROM local_const), NULL),
                       -- Add flags to dlopen
                       ((SELECT id FROM LibdlHook WHERE symbol="dlopen"), 0, (SELECT AddInt FROM local_const), (SELECT id FROM ActionArgument WHERE value="0" AND next IS NULL)),
-                      -- Modify flags of dlopen and dlmopen
-                      ((SELECT id FROM LibdlHook WHERE symbol="dlopen"), 2, (SELECT ModifyInt FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      -- Modify flags of dlmopen
                       ((SELECT id FROM LibdlHook WHERE symbol="dlmopen"), 0, (SELECT ModifyInt FROM local_const), (SELECT id FROM ActionArgument WHERE value="0" AND next IS NULL)),
-                      ((SELECT id FROM LibdlHook WHERE symbol="dlmopen"), 2, (SELECT ModifyInt FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
                       -- Filter environment parameter
                       ((SELECT id FROM LibcHook WHERE symbol="execl"), 2, (SELECT FilterEnvironment FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="execle"), 2, (SELECT FilterEnvironment FROM local_const), NULL),
