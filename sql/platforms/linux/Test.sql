@@ -21,11 +21,7 @@ WITH local_const AS (SELECT (SELECT id FROM WhitelistClass WHERE class="Filesyst
                             (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable") AS Writable,
                             (SELECT id FROM WhitelistClass WHERE class="Network/Range/CIDR") AS CIDR,
                             (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port") AS Port)
-SELECT * FROM (VALUES ("ANY", "/bin/bash", "664d9dd14597b83aebf765d2d054fa40ad7a93ffeca43ee3bba596517db2c39b", (SELECT BLAKE3 FROM local_const)),
-                      ("ANY", "/bin/sh", "30751ae1ba8597ee7d9aa7e3852a58d9b21a14b88e423cbb0aa7d0512d059a6a", (SELECT BLAKE3 FROM local_const)),
-                      ("ANY", "/usr/bin/bash", "664d9dd14597b83aebf765d2d054fa40ad7a93ffeca43ee3bba596517db2c39b", (SELECT BLAKE3 FROM local_const)),
-                      ("ANY", "/usr/bin/sh", "30751ae1ba8597ee7d9aa7e3852a58d9b21a14b88e423cbb0aa7d0512d059a6a", (SELECT BLAKE3 FROM local_const)),
-                      ("ANY", "/usr/sbin/apache2", "4aadc76a6af5d65197cb9cdf7d7a6945772539c48c0120919f38f77af29c0f53", (SELECT BLAKE3 FROM local_const)),
+SELECT * FROM (VALUES ("ANY", "/usr/sbin/apache2", "4aadc76a6af5d65197cb9cdf7d7a6945772539c48c0120919f38f77af29c0f53", (SELECT BLAKE3 FROM local_const)),
                       ("ANY", "/usr/bin/whoami", "5ff499d1ce89604780cd1b2d85be2a10b5076cf941950ab53a8ba092815efa7b", (SELECT BLAKE3 FROM local_const)),
                       ("ANY", "/bin/bash", "/usr/sbin/apache2", (SELECT Executable FROM local_const)),
                       ("ANY", "/bin/sh", "/usr/sbin/apache2", (SELECT Executable FROM local_const)),
