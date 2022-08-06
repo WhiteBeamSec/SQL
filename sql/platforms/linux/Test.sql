@@ -36,6 +36,8 @@ SELECT * FROM (VALUES ("ANY", "/usr/sbin/apache2", "4aadc76a6af5d65197cb9cdf7d7a
                       ("ANY", "/usr/bin/bash", (SELECT LibraryPath FROM global_const) || "libnss_systemd.so.2", (SELECT Library FROM local_const)),
                       ("ANY", "/bin/bash", (SELECT LibraryPath FROM global_const) || "libtinfo.so.6", (SELECT Library FROM local_const)),
                       ("ANY", "/usr/bin/bash", (SELECT LibraryPath FROM global_const) || "libtinfo.so.6", (SELECT Library FROM local_const)),
+                      ("ANY", "/usr/bin/whoami", (SELECT LibraryPath FROM global_const) || "libnss_files.so.2", (SELECT Library FROM local_const)),
+                      ("ANY", "/usr/bin/whoami", (SELECT LibraryPath FROM global_const) || "libnss_systemd.so.2", (SELECT Library FROM local_const)),
                       ("ANY", "/usr/src/whitebeam/target/release/whitebeam", (SELECT LibraryPath FROM global_const) || "libssl.so.1.1", (SELECT Library FROM local_const)),
                       ("ANY", "/usr/src/whitebeam/target/release/whitebeam", (SELECT LibraryPath FROM global_const) || "libcrypto.so.1.1", (SELECT Library FROM local_const)),
                       ("ANY", "/usr/src/whitebeam/target/release/whitebeam", "11998", (SELECT Port FROM local_const)));
