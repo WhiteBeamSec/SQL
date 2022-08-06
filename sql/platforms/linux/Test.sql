@@ -22,7 +22,7 @@ WITH local_const AS (SELECT (SELECT id FROM WhitelistClass WHERE class="Filesyst
                             (SELECT id FROM WhitelistClass WHERE class="Network/Range/CIDR") AS CIDR,
                             (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port") AS Port)
 SELECT * FROM (VALUES ("ANY", "/usr/sbin/apache2", "4aadc76a6af5d65197cb9cdf7d7a6945772539c48c0120919f38f77af29c0f53", (SELECT BLAKE3 FROM local_const)),
-                      ("ANY", "/usr/bin/whoami", "5ff499d1ce89604780cd1b2d85be2a10b5076cf941950ab53a8ba092815efa7b", (SELECT BLAKE3 FROM local_const)),
+                      ("ANY", "/usr/bin/whoami", "ANY", (SELECT BLAKE3 FROM local_const)),
                       ("ANY", "/bin/bash", "/usr/sbin/apache2", (SELECT Executable FROM local_const)),
                       ("ANY", "/bin/sh", "/usr/sbin/apache2", (SELECT Executable FROM local_const)),
                       ("ANY", "ANY", "/usr/src/whitebeam/target/release/whitebeam", (SELECT Executable FROM local_const)),
