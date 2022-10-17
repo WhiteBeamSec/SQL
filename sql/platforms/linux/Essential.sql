@@ -75,7 +75,6 @@ SELECT * FROM (VALUES ("ANY", "ANY", "/bin/bash", (SELECT Executable FROM local_
 --       For now, do not report security issues unless all Execution and Filesystem hooks are enabled (currently this comes at some stability costs).
 INSERT INTO Hook (symbol, library, enabled, language, class)
 WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.6") AS libc,
-                            ((SELECT LibraryPath FROM global_const) || "libdl.so.2") AS libdl,
                             (SELECT id FROM HookClass WHERE class="Execution") AS Execution,
                             (SELECT id FROM HookClass WHERE class="Filesystem") AS Filesystem,
                             (SELECT id FROM HookClass WHERE class="Network") AS Network)
@@ -90,8 +89,6 @@ SELECT * FROM (VALUES -- Execution
                       ("fexecve", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       ("posix_spawn", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       ("posix_spawnp", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
-                      ("dlopen", (SELECT libdl FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
-                      ("dlmopen", (SELECT libdl FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       ("kill", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       -- Filesystem
                       ("creat", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
@@ -145,7 +142,6 @@ SELECT * FROM (VALUES -- Execution
                       ("connect", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Network FROM local_const)));
 
 CREATE TEMPORARY VIEW LibcHook AS SELECT id, symbol FROM Hook WHERE library = (SELECT LibraryPath FROM global_const) || "libc.so.6";
-CREATE TEMPORARY VIEW LibdlHook AS SELECT id, symbol FROM Hook WHERE library = (SELECT LibraryPath FROM global_const) || "libdl.so.2";
 
 -- Argument
 INSERT INTO Argument (name, position, hook, datatype)
@@ -203,13 +199,6 @@ SELECT * FROM (VALUES -- Execution
                       ("attrp", 3, (SELECT id FROM LibcHook WHERE symbol="posix_spawnp"), (SELECT StructPointer FROM local_const)),
                       ("argv", 4, (SELECT id FROM LibcHook WHERE symbol="posix_spawnp"), (SELECT StringArray FROM local_const)),
                       ("envp", 5, (SELECT id FROM LibcHook WHERE symbol="posix_spawnp"), (SELECT StringArray FROM local_const)),
-                      -- dlopen
-                      ("filename", 0, (SELECT id FROM LibdlHook WHERE symbol="dlopen"), (SELECT String FROM local_const)),
-                      ("flags", 1, (SELECT id FROM LibdlHook WHERE symbol="dlopen"), (SELECT IntegerSigned FROM local_const)),
-                      -- dlmopen
-                      ("lmid", 0, (SELECT id FROM LibdlHook WHERE symbol="dlmopen"), (SELECT LongSigned FROM local_const)),
-                      ("filename", 1, (SELECT id FROM LibdlHook WHERE symbol="dlmopen"), (SELECT String FROM local_const)),
-                      ("flags", 2, (SELECT id FROM LibdlHook WHERE symbol="dlmopen"), (SELECT IntegerSigned FROM local_const)),
                       -- kill
                       ("pid", 0, (SELECT id FROM LibcHook WHERE symbol="kill"), (SELECT IntegerSigned FROM local_const)),
                       ("sig", 1, (SELECT id FROM LibcHook WHERE symbol="kill"), (SELECT IntegerSigned FROM local_const)),
@@ -408,15 +397,13 @@ SELECT * FROM (VALUES -- Execution
 
 -- ActionArgument
 INSERT INTO ActionArgument (value, next)
-WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.6") AS libc,
-                            ((SELECT LibraryPath FROM global_const) || "libdl.so.2") AS libdl)
+WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.6") AS libc)
 SELECT * FROM (VALUES -- AddInt
                       -- ModifyInt
                       ("0", NULL), -- LM_ID_BASE
                       -- RedirectFunction
                       ("execve", NULL), ((SELECT libc FROM local_const), last_insert_rowid()),
                       ("posix_spawn", NULL), ((SELECT libc FROM local_const), last_insert_rowid()),
-                      ("dlmopen", NULL), ((SELECT libdl FROM local_const), last_insert_rowid()),
                       ("ftruncate", NULL), ((SELECT libc FROM local_const), last_insert_rowid()),
                       ("ftruncate64", NULL), ((SELECT libc FROM local_const), last_insert_rowid()),
                       ("fdopen", NULL), ((SELECT libc FROM local_const), last_insert_rowid()),
@@ -437,7 +424,6 @@ SELECT * FROM (VALUES -- AddInt
 -- Rule
 INSERT INTO Rule (hook, position, action, actionarg)
 WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.6") AS libc,
-                            ((SELECT LibraryPath FROM global_const) || "libdl.so.2") AS libdl,
                             (SELECT id FROM Action WHERE name="AddEnvironment") AS AddEnvironment,
                             (SELECT id FROM Action WHERE name="AddInt") AS AddInt,
                             (SELECT id FROM Action WHERE name="CanonicalizePath") AS CanonicalizePath,
@@ -453,14 +439,12 @@ WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.
                             (SELECT id FROM Action WHERE name="VerifyCanWrite") AS VerifyCanWrite,
                             (SELECT id FROM Action WHERE name="VerifyFileHash") AS VerifyFileHash)
 SELECT * FROM (VALUES -- Execution
-                      -- Canonicalize path for exec*p*, dl*open, and posix_spawnp
+                      -- Canonicalize path for exec*p* and posix_spawnp
                       -- TODO: Should the path in all exec* hooks be canonicalized here to reduce the size of the whitelist?
                       ((SELECT id FROM LibcHook WHERE symbol="execlp"), 0, (SELECT CanonicalizePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="execvp"), 0, (SELECT CanonicalizePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="execvpe"), 0, (SELECT CanonicalizePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="posix_spawnp"), 1, (SELECT CanonicalizePath FROM local_const), NULL),
-                      ((SELECT id FROM LibdlHook WHERE symbol="dlopen"), 0, (SELECT CanonicalizePath FROM local_const), NULL),
-                      ((SELECT id FROM LibdlHook WHERE symbol="dlmopen"), 1, (SELECT CanonicalizePath FROM local_const), NULL),
                       -- Check if the target is a whitelisted executable (TOCTOU prevented by Filesystem hooks)
                       ((SELECT id FROM LibcHook WHERE symbol="execl"), 0, (SELECT VerifyCanExecute FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="execle"), 0, (SELECT VerifyCanExecute FROM local_const), NULL),
@@ -472,8 +456,6 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="fexecve"), 0, (SELECT VerifyCanExecute FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="posix_spawn"), 1, (SELECT VerifyCanExecute FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="posix_spawnp"), 1, (SELECT VerifyCanExecute FROM local_const), NULL),
-                      ((SELECT id FROM LibdlHook WHERE symbol="dlopen"), 0, (SELECT VerifyCanExecute FROM local_const), NULL),
-                      ((SELECT id FROM LibdlHook WHERE symbol="dlmopen"), 1, (SELECT VerifyCanExecute FROM local_const), NULL),
                       -- Check if the executable hash is whitelisted (TOCTOU prevented by Filesystem hooks)
                       ((SELECT id FROM LibcHook WHERE symbol="execl"), 0, (SELECT VerifyFileHash FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="execle"), 0, (SELECT VerifyFileHash FROM local_const), NULL),
@@ -485,7 +467,6 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="fexecve"), 0, (SELECT VerifyFileHash FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="posix_spawn"), 1, (SELECT VerifyFileHash FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="posix_spawnp"), 1, (SELECT VerifyFileHash FROM local_const), NULL),
-                      -- TODO: dlopen and dlmopen?
                       -- Convert execl* variadic parameters into an array
                       ((SELECT id FROM LibcHook WHERE symbol="execl"), 1, (SELECT ConsumeVariadic FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="execle"), 1, (SELECT ConsumeVariadic FROM local_const), NULL),
@@ -495,10 +476,6 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="execlp"), 2, (SELECT AddEnvironment FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="execv"), 2, (SELECT AddEnvironment FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="execvp"), 2, (SELECT AddEnvironment FROM local_const), NULL),
-                      -- Add flags to dlopen
-                      ((SELECT id FROM LibdlHook WHERE symbol="dlopen"), 0, (SELECT AddInt FROM local_const), (SELECT id FROM ActionArgument WHERE value="0" AND next IS NULL)),
-                      -- Modify flags of dlmopen
-                      ((SELECT id FROM LibdlHook WHERE symbol="dlmopen"), 0, (SELECT ModifyInt FROM local_const), (SELECT id FROM ActionArgument WHERE value="0" AND next IS NULL)),
                       -- Filter environment parameter
                       ((SELECT id FROM LibcHook WHERE symbol="execl"), 2, (SELECT FilterEnvironment FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="execle"), 2, (SELECT FilterEnvironment FROM local_const), NULL),
@@ -519,8 +496,6 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="execvpe"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="execve" AND next IS NULL))),
                       -- Redirect posix_spawnp to posix_spawn
                       ((SELECT id FROM LibcHook WHERE symbol="posix_spawnp"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="posix_spawn" AND next IS NULL))),
-                      -- Redirect dlopen to dlmopen
-                      ((SELECT id FROM LibdlHook WHERE symbol="dlopen"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libdl FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="dlmopen" AND next IS NULL))),
                       -- Disallow killing the WhiteBeam service (TODO: pidfd_send_signal support for Linux >=5.1)
                       ((SELECT id FROM LibcHook WHERE symbol="kill"), 0, (SELECT VerifyCanTerminate FROM local_const), NULL),
                       -- Filesystem
