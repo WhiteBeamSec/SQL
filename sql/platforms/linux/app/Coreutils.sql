@@ -8,7 +8,7 @@ Version: 0.3.0-dev
 */
 
 CREATE TEMPORARY TABLE IF NOT EXISTS global_const
-AS SELECT (SELECT "/lib/" || (SELECT value FROM Setting WHERE param="SystemArchitecture") || "-linux-gnu/") AS LibraryPath;
+AS SELECT (SELECT value FROM Setting WHERE param="SystemLibraryPath") AS LibraryPath;
 
 INSERT OR IGNORE INTO Whitelist (parent, path, value, class)
 WITH local_const AS (SELECT (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Executable") AS Executable,

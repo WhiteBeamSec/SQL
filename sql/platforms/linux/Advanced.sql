@@ -12,7 +12,7 @@ Version: 0.3.0-dev
 
 CREATE TEMPORARY TABLE IF NOT EXISTS global_const
 AS SELECT (SELECT id FROM HookLanguage WHERE language="C") AS C,
-          (SELECT "/lib/" || (SELECT value FROM Setting WHERE param="SystemArchitecture") || "-linux-gnu/") AS LibraryPath;
+          (SELECT value FROM Setting WHERE param="SystemLibraryPath") AS LibraryPath;
 
 -- Hook
 INSERT INTO Hook (symbol, library, enabled, language, class)

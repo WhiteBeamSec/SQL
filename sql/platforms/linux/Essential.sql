@@ -24,7 +24,8 @@ Version: 0.3.0-dev
 
 CREATE TEMPORARY TABLE IF NOT EXISTS global_const
 AS SELECT (SELECT id FROM HookLanguage WHERE language="C") AS C,
-          (SELECT "/lib/" || (SELECT value FROM Setting WHERE param="SystemArchitecture") || "-linux-gnu/") AS LibraryPath;
+          (SELECT value FROM Setting WHERE param="SystemLibraryPath") AS LibraryPath,
+          (SELECT IIF(((SELECT value FROM Setting WHERE param="SystemLibraryPath") LIKE "/lib64/%"), "/lib64/", "/lib/")) AS TrustedLibraryPath;
 
 -- Whitelist
 INSERT OR IGNORE INTO Whitelist (parent, path, value, class)
@@ -39,7 +40,7 @@ SELECT * FROM (VALUES ("ANY", "ANY", "/bin/bash", (SELECT Executable FROM local_
                       ("ANY", "ANY", "/usr/bin/sh", (SELECT Executable FROM local_const)),
                       ("ANY", "ANY", "/opt/WhiteBeam/whitebeam", (SELECT Executable FROM local_const)),
                       ("ANY", "ANY", "/usr/local/bin/whitebeam", (SELECT Executable FROM local_const)),
-                      ("ANY", "ANY", "/lib/libwhitebeam.so", (SELECT Library FROM local_const)),
+                      ("ANY", "ANY", (SELECT TrustedLibraryPath FROM global_const) || "libwhitebeam.so", (SELECT Library FROM local_const)),
                       ("ANY", "ANY", "/opt/WhiteBeam/libwhitebeam.so", (SELECT Library FROM local_const)),
                       ("ANY", "ANY", (SELECT LibraryPath FROM global_const) || "libc.so.6", (SELECT Library FROM local_const)),
                       ("ANY", "ANY", (SELECT LibraryPath FROM global_const) || "libgcc_s.so.1", (SELECT Library FROM local_const)),
@@ -56,7 +57,7 @@ SELECT * FROM (VALUES ("ANY", "ANY", "/bin/bash", (SELECT Executable FROM local_
                       ("ANY", "/usr/bin/sh", "ANY", (SELECT BLAKE3 FROM local_const)),
                       ("ANY", "/opt/WhiteBeam/whitebeam", "ANY", (SELECT BLAKE3 FROM local_const)),
                       ("ANY", "/usr/local/bin/whitebeam", "ANY", (SELECT BLAKE3 FROM local_const)),
-                      ("ANY", "/lib/libwhitebeam.so", "ANY", (SELECT BLAKE3 FROM local_const)),
+                      ("ANY", (SELECT TrustedLibraryPath FROM global_const) || "libwhitebeam.so", "ANY", (SELECT BLAKE3 FROM local_const)),
                       ("ANY", "/opt/WhiteBeam/libwhitebeam.so", "ANY", (SELECT BLAKE3 FROM local_const)),
                       ("ANY", (SELECT LibraryPath FROM global_const) || "libc.so.6", "ANY", (SELECT BLAKE3 FROM local_const)),
                       ("ANY", (SELECT LibraryPath FROM global_const) || "libgcc_s.so.1", "ANY", (SELECT BLAKE3 FROM local_const)),

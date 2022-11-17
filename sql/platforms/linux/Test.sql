@@ -8,7 +8,7 @@ Version: 0.3.0-dev
 */
 
 CREATE TEMPORARY TABLE IF NOT EXISTS global_const
-AS SELECT (SELECT "/lib/" || (SELECT value FROM Setting WHERE param="SystemArchitecture") || "-linux-gnu/") AS LibraryPath;
+AS SELECT (SELECT value FROM Setting WHERE param="SystemLibraryPath") AS LibraryPath;
 
 -- HookClass
 INSERT OR IGNORE INTO HookClass (class) VALUES ("Test");

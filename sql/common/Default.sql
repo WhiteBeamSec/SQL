@@ -53,8 +53,9 @@ INSERT INTO Setting (param, value) VALUES ("ConsoleSecret", "undefined"),
                                           ("ServerPublicKey", "undefined"),
                                           ("ServerType", "undefined"),
                                           ("ServicePort", "11998"),
-                                          ("SettingsModified", "-1"),
-                                          ("SystemArchitecture", "undefined");
+                                          ("SettingsModified", "-1"), -- TODO: Still needed?
+                                          ("SystemArchitecture", "undefined"),
+                                          ("SystemLibraryPath", "undefined");
 
 -- Action
 INSERT INTO Action (name) VALUES ("AddEnvironment"),
