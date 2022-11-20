@@ -90,8 +90,11 @@ SELECT * FROM (VALUES -- Execution
                       ("execvp", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       ("execvpe", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       ("fexecve", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
+                      ("popen", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       ("posix_spawn", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       ("posix_spawnp", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
+                      ("system", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
+                      ("wordexp", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       ("kill", (SELECT libc FROM local_const), TRUE, (SELECT C FROM global_const), (SELECT Execution FROM local_const)),
                       -- Filesystem
                       ("creat", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
@@ -188,6 +191,9 @@ SELECT * FROM (VALUES -- Execution
                       ("fd", 0, (SELECT id FROM LibcHook WHERE symbol="fexecve"), (SELECT IntegerSigned FROM local_const)),
                       ("argv", 1, (SELECT id FROM LibcHook WHERE symbol="fexecve"), (SELECT StringArray FROM local_const)),
                       ("envp", 2, (SELECT id FROM LibcHook WHERE symbol="fexecve"), (SELECT StringArray FROM local_const)),
+                      -- popen
+                      ("command", 0, (SELECT id FROM LibcHook WHERE symbol="popen"), (SELECT String FROM local_const)),
+                      ("type", 1, (SELECT id FROM LibcHook WHERE symbol="popen"), (SELECT String FROM local_const)),
                       -- posix_spawn
                       ("pid", 0, (SELECT id FROM LibcHook WHERE symbol="posix_spawn"), (SELECT IntegerSignedPointer FROM local_const)),
                       ("path", 1, (SELECT id FROM LibcHook WHERE symbol="posix_spawn"), (SELECT String FROM local_const)),
@@ -202,6 +208,12 @@ SELECT * FROM (VALUES -- Execution
                       ("attrp", 3, (SELECT id FROM LibcHook WHERE symbol="posix_spawnp"), (SELECT StructPointer FROM local_const)),
                       ("argv", 4, (SELECT id FROM LibcHook WHERE symbol="posix_spawnp"), (SELECT StringArray FROM local_const)),
                       ("envp", 5, (SELECT id FROM LibcHook WHERE symbol="posix_spawnp"), (SELECT StringArray FROM local_const)),
+                      -- system
+                      ("command", 0, (SELECT id FROM LibcHook WHERE symbol="system"), (SELECT String FROM local_const)),
+                      -- wordexp
+                      ("s", 0, (SELECT id FROM LibcHook WHERE symbol="wordexp"), (SELECT String FROM local_const)),
+                      ("p", 1, (SELECT id FROM LibcHook WHERE symbol="wordexp"), (SELECT StructPointer FROM local_const)),
+                      ("flags", 2, (SELECT id FROM LibcHook WHERE symbol="wordexp"), (SELECT IntegerSigned FROM local_const)),
                       -- kill
                       ("pid", 0, (SELECT id FROM LibcHook WHERE symbol="kill"), (SELECT IntegerSigned FROM local_const)),
                       ("sig", 1, (SELECT id FROM LibcHook WHERE symbol="kill"), (SELECT IntegerSigned FROM local_const)),
@@ -501,6 +513,10 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="posix_spawnp"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="posix_spawn" AND next IS NULL))),
                       -- Disallow killing the WhiteBeam service (TODO: pidfd_send_signal support for Linux >=5.1)
                       ((SELECT id FROM LibcHook WHERE symbol="kill"), 0, (SELECT VerifyCanTerminate FROM local_const), NULL),
+                      -- Filter environment for popen, system, and wordexp
+                      ((SELECT id FROM LibcHook WHERE symbol="popen"), NULL, (SELECT FilterEnvironment FROM local_const), NULL),
+                      ((SELECT id FROM LibcHook WHERE symbol="system"), NULL, (SELECT FilterEnvironment FROM local_const), NULL),
+                      ((SELECT id FROM LibcHook WHERE symbol="wordexp"), NULL, (SELECT FilterEnvironment FROM local_const), NULL),
                       -- Filesystem
                       -- Open file descriptor for the target path
                       ((SELECT id FROM LibcHook WHERE symbol="fopen"), 0, (SELECT OpenFileDescriptor FROM local_const), NULL),
