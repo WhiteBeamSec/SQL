@@ -452,6 +452,7 @@ WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.
                             (SELECT id FROM Action WHERE name="PopulateTemplate") AS PopulateTemplate,
                             (SELECT id FROM Action WHERE name="RedirectFunction") AS RedirectFunction,
                             (SELECT id FROM Action WHERE name="SplitFilePath") AS SplitFilePath,
+                            (SELECT id FROM Action WHERE name="VerifyCanConnect") AS VerifyCanConnect,
                             (SELECT id FROM Action WHERE name="VerifyCanExecute") AS VerifyCanExecute,
                             (SELECT id FROM Action WHERE name="VerifyCanTerminate") AS VerifyCanTerminate,
                             (SELECT id FROM Action WHERE name="VerifyCanWrite") AS VerifyCanWrite,
@@ -664,6 +665,9 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="__open_2"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="__openat_2" AND next IS NULL))),
                       ((SELECT id FROM LibcHook WHERE symbol="__open64"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="__openat64_2" AND next IS NULL))),
                       ((SELECT id FROM LibcHook WHERE symbol="__open64_2"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="__openat64_2" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="__xmknod"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="__xmknodat" AND next IS NULL))));
+                      ((SELECT id FROM LibcHook WHERE symbol="__xmknod"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="__xmknodat" AND next IS NULL))),
+                      -- Network
+                      -- Check if the target socket address is whitelisted
+                      ((SELECT id FROM LibcHook WHERE symbol="connect"), 1, (SELECT VerifyCanConnect FROM local_const), NULL));
 
 COMMIT;
