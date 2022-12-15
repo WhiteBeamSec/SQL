@@ -7,8 +7,9 @@ INSERT INTO WhitelistClass (class) VALUES ("Hash/SHA3-256"),
                                           ("Filesystem/Directory/Writable"),
                                           ("Filesystem/Path/Executable"),
                                           ("Filesystem/Path/Library"),
-                                          ("Network/Range/CIDR"),
-                                          ("Network/Range/Port"),
+                                          ("Network/Range/Accept"),
+                                          ("Network/Range/Bind"),
+                                          ("Network/Range/Connect"),
                                           ("Certificate/DER"),
                                           ("Certificate/PEM");
 

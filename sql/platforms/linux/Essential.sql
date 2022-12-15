@@ -32,7 +32,7 @@ WITH local_const AS (SELECT (SELECT id FROM WhitelistClass WHERE class="Filesyst
                             (SELECT id FROM WhitelistClass WHERE class="Filesystem/Path/Library") AS Library,
                             (SELECT id FROM WhitelistClass WHERE class="Hash/BLAKE3") AS BLAKE3,
                             (SELECT id FROM WhitelistClass WHERE class="Filesystem/Directory/Writable") AS Writable,
-                            (SELECT id FROM WhitelistClass WHERE class="Network/Range/Port") AS Port)
+                            (SELECT id FROM WhitelistClass WHERE class="Network/Range/Bind") AS Bind)
 SELECT * FROM (VALUES ("ANY", "ANY", "/bin/bash", (SELECT Executable FROM local_const)),
                       ("ANY", "ANY", "/bin/sh", (SELECT Executable FROM local_const)),
                       ("ANY", "ANY", "/usr/bin/bash", (SELECT Executable FROM local_const)),
@@ -68,8 +68,8 @@ SELECT * FROM (VALUES ("ANY", "ANY", "/bin/bash", (SELECT Executable FROM local_
                       ("ANY", (SELECT LibraryPath FROM global_const) || "libssl.so.1.1", "ANY", (SELECT BLAKE3 FROM local_const)),
                       ("ANY", (SELECT LibraryPath FROM global_const) || "libcrypto.so.1.1", "ANY", (SELECT BLAKE3 FROM local_const)),
                       ("ANY", "ANY", "/dev/pts/", (SELECT Writable FROM local_const)),
-                      ("ANY", "/opt/WhiteBeam/whitebeam", "11998", (SELECT Port FROM local_const)),
-                      ("ANY", "/usr/local/bin/whitebeam", "11998", (SELECT Port FROM local_const)));
+                      ("ANY", "/opt/WhiteBeam/whitebeam", "0.0.0.0/0:11998", (SELECT Bind FROM local_const)),
+                      ("ANY", "/usr/local/bin/whitebeam", "0.0.0.0/0:11998", (SELECT Bind FROM local_const)));
 
 -- Hook
 -- TODO: Make sure this reflects the libraries present on a system
