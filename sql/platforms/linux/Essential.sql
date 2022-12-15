@@ -13,9 +13,8 @@ Version: 0.3.0-dev
 --   freopen64
 --   tmpfile
 --   tmpfile64
---   mktemp
 --   mkdtemp
---   mkstemp
+--   mkstemps
 --   mkostemp64
 --   mkostemps64
 --   mkstemp64
@@ -133,6 +132,7 @@ SELECT * FROM (VALUES -- Execution
                       ("ftruncate64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("mknod", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("mknodat", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("mkstemp", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("__open64_2", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("__open64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("__openat64_2", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
@@ -354,6 +354,8 @@ SELECT * FROM (VALUES -- Execution
                       ("pathname", 1, (SELECT id FROM LibcHook WHERE symbol="mknodat"), (SELECT String FROM local_const)),
                       ("mode", 2, (SELECT id FROM LibcHook WHERE symbol="mknodat"), (SELECT IntegerUnsigned FROM local_const)),
                       ("dev", 3, (SELECT id FROM LibcHook WHERE symbol="mknodat"), (SELECT LongUnsigned FROM local_const)),
+                      -- mkstemp
+                      ("template", 0, (SELECT id FROM LibcHook WHERE symbol="mkstemp"), (SELECT String FROM local_const)),
                       -- __open64_2
                       ("pathname", 0, (SELECT id FROM LibcHook WHERE symbol="__open64_2"), (SELECT String FROM local_const)),
                       ("flags", 1, (SELECT id FROM LibcHook WHERE symbol="__open64_2"), (SELECT IntegerSigned FROM local_const)),
@@ -447,6 +449,7 @@ WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.
                             (SELECT id FROM Action WHERE name="FilterEnvironment") AS FilterEnvironment,
                             (SELECT id FROM Action WHERE name="ModifyInt") AS ModifyInt,
                             (SELECT id FROM Action WHERE name="OpenFileDescriptor") AS OpenFileDescriptor,
+                            (SELECT id FROM Action WHERE name="PopulateTemplate") AS PopulateTemplate,
                             (SELECT id FROM Action WHERE name="RedirectFunction") AS RedirectFunction,
                             (SELECT id FROM Action WHERE name="SplitFilePath") AS SplitFilePath,
                             (SELECT id FROM Action WHERE name="VerifyCanExecute") AS VerifyCanExecute,
@@ -540,6 +543,7 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="symlink"), 1, (SELECT SplitFilePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="unlink"), 0, (SELECT SplitFilePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="mknod"), 0, (SELECT SplitFilePath FROM local_const), NULL),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemp"), 0, (SELECT SplitFilePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="__open"), 0, (SELECT SplitFilePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="__open_2"), 0, (SELECT SplitFilePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="__open64"), 0, (SELECT SplitFilePath FROM local_const), NULL),
@@ -563,6 +567,8 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="__openat_2"), 0, (SELECT CombineDirectory FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="__openat64_2"), 0, (SELECT CombineDirectory FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="__xmknodat"), 1, (SELECT CombineDirectory FROM local_const), NULL),
+                      -- Populate template parameter of mk*temp*
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemp"), 1, (SELECT PopulateTemplate FROM local_const), NULL),
                       -- Check if the target directory is whitelisted (if this is a write operation)
                       ((SELECT id FROM LibcHook WHERE symbol="chmod"), 0, (SELECT VerifyCanWrite FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="chown"), 0, (SELECT VerifyCanWrite FROM local_const), NULL),
@@ -608,6 +614,7 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="symlinkat"), 1, (SELECT VerifyCanWrite FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="unlinkat"), 0, (SELECT VerifyCanWrite FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="mknodat"), 0, (SELECT VerifyCanWrite FROM local_const), NULL),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemp"), 0, (SELECT VerifyCanWrite FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="__openat_2"), 0, (SELECT VerifyCanWrite FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="__openat64_2"), 0, (SELECT VerifyCanWrite FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="__xmknodat"), 1, (SELECT VerifyCanWrite FROM local_const), NULL),
@@ -629,6 +636,8 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="creat64"), NULL, (SELECT AddInt FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="lchown"), 4, (SELECT AddInt FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="link"), 4, (SELECT AddInt FROM local_const), NULL),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemp"), 2, (SELECT AddInt FROM local_const), NULL),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemp"), 3, (SELECT AddInt FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="rmdir"), 2, (SELECT AddInt FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="unlink"), 2, (SELECT AddInt FROM local_const), NULL),
                       -- Redirect to TOCTOU safe function (*at/f*)
@@ -650,6 +659,7 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="truncate64"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="ftruncate64" AND next IS NULL))),
                       ((SELECT id FROM LibcHook WHERE symbol="fopen"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="fdopen" AND next IS NULL))),
                       ((SELECT id FROM LibcHook WHERE symbol="fopen64"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="fdopen" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemp"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="openat" AND next IS NULL))),
                       ((SELECT id FROM LibcHook WHERE symbol="__open"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="__openat_2" AND next IS NULL))),
                       ((SELECT id FROM LibcHook WHERE symbol="__open_2"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="__openat_2" AND next IS NULL))),
                       ((SELECT id FROM LibcHook WHERE symbol="__open64"), NULL, (SELECT RedirectFunction FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="__openat64_2" AND next IS NULL))),
