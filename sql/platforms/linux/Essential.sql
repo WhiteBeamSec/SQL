@@ -538,7 +538,7 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="open"), 0, (SELECT SplitFilePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="open64"), 0, (SELECT SplitFilePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="rename"), 0, (SELECT SplitFilePath FROM local_const), NULL),
-                      ((SELECT id FROM LibcHook WHERE symbol="rename"), 1, (SELECT SplitFilePath FROM local_const), NULL),
+                      ((SELECT id FROM LibcHook WHERE symbol="rename"), 2, (SELECT SplitFilePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="mkdir"), 0, (SELECT SplitFilePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="rmdir"), 0, (SELECT SplitFilePath FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="symlink"), 1, (SELECT SplitFilePath FROM local_const), NULL),
