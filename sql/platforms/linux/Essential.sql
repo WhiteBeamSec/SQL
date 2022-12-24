@@ -729,19 +729,19 @@ INSERT INTO Rule (hook, position, action, actionarg)
 WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.6") AS libc,
                             (SELECT id FROM Action WHERE name="Exit") AS Exit)
 SELECT * FROM (VALUES -- Exit program with status 1
-                      ((SELECT id FROM LibcHook WHERE symbol="freopen"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="freopen64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="mkfifo"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="mkfifoat"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="mkdtemp"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="mkostemp"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="mkostemps"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="mkstemps"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="mkostemp64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="mkostemps64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="mkstemp64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="mkstemps64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="tmpfile"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
-                      ((SELECT id FROM LibcHook WHERE symbol="tmpfile64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))));
+                      ((SELECT id FROM LibcHook WHERE symbol="freopen"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="freopen64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkfifo"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkfifoat"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkdtemp"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkostemp"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkostemps"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemps"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkostemp64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkostemps64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemp64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemps64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="tmpfile"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)),
+                      ((SELECT id FROM LibcHook WHERE symbol="tmpfile64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL)));
 
 COMMIT;
