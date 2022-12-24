@@ -14,11 +14,16 @@ Version: 0.3.0-dev
 --   tmpfile
 --   tmpfile64
 --   mkdtemp
+--   mkostemp
 --   mkstemps
+--   mkostemps
 --   mkostemp64
 --   mkostemps64
 --   mkstemp64
 --   mkstemps64
+--   mkfifo
+--   mkfifoat
+-- TODO: Whitelist *mknod* major dev, corresponding action?
 -- TODO: Dynamically mangle/demangle C++ symbols
 
 CREATE TEMPORARY TABLE IF NOT EXISTS global_const
@@ -101,8 +106,8 @@ SELECT * FROM (VALUES -- Execution
                       ("fdopen", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("fopen", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("fopen64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
-                      --("freopen", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
-                      --("freopen64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("freopen", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("freopen64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("open", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("open64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("openat", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
@@ -130,9 +135,21 @@ SELECT * FROM (VALUES -- Execution
                       ("truncate64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("ftruncate", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("ftruncate64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("mkfifo", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("mkfifoat", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("mknod", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("mknodat", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("mkstemp", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("mkdtemp", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("mkostemp", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("mkostemps", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("mkstemps", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("mkostemp64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("mkostemps64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("mkstemp64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("mkstemps64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("tmpfile", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
+                      ("tmpfile64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("__open64_2", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("__open64", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
                       ("__openat64_2", (SELECT libc FROM local_const), FALSE, (SELECT C FROM global_const), (SELECT Filesystem FROM local_const)),
@@ -234,13 +251,13 @@ SELECT * FROM (VALUES -- Execution
                       ("pathname", 0, (SELECT id FROM LibcHook WHERE symbol="fopen64"), (SELECT String FROM local_const)),
                       ("mode", 1, (SELECT id FROM LibcHook WHERE symbol="fopen64"), (SELECT String FROM local_const)),
                       -- freopen
-                      --("pathname", 0, (SELECT id FROM LibcHook WHERE symbol="freopen"), (SELECT String FROM local_const)),
-                      --("mode", 1, (SELECT id FROM LibcHook WHERE symbol="freopen"), (SELECT String FROM local_const)),
-                      --("stream", 2, (SELECT id FROM LibcHook WHERE symbol="freopen"), (SELECT StructPointer FROM local_const)),
+                      ("pathname", 0, (SELECT id FROM LibcHook WHERE symbol="freopen"), (SELECT String FROM local_const)),
+                      ("mode", 1, (SELECT id FROM LibcHook WHERE symbol="freopen"), (SELECT String FROM local_const)),
+                      ("stream", 2, (SELECT id FROM LibcHook WHERE symbol="freopen"), (SELECT StructPointer FROM local_const)),
                       -- freopen64
-                      --("pathname", 0, (SELECT id FROM LibcHook WHERE symbol="freopen64"), (SELECT String FROM local_const)),
-                      --("mode", 1, (SELECT id FROM LibcHook WHERE symbol="freopen64"), (SELECT String FROM local_const)),
-                      --("stream", 2, (SELECT id FROM LibcHook WHERE symbol="freopen64"), (SELECT StructPointer FROM local_const)),
+                      ("pathname", 0, (SELECT id FROM LibcHook WHERE symbol="freopen64"), (SELECT String FROM local_const)),
+                      ("mode", 1, (SELECT id FROM LibcHook WHERE symbol="freopen64"), (SELECT String FROM local_const)),
+                      ("stream", 2, (SELECT id FROM LibcHook WHERE symbol="freopen64"), (SELECT StructPointer FROM local_const)),
                       -- open
                       ("pathname", 0, (SELECT id FROM LibcHook WHERE symbol="open"), (SELECT String FROM local_const)),
                       ("flags", 1, (SELECT id FROM LibcHook WHERE symbol="open"), (SELECT IntegerSigned FROM local_const)),
@@ -345,6 +362,13 @@ SELECT * FROM (VALUES -- Execution
                       -- ftruncate64
                       ("fd", 0, (SELECT id FROM LibcHook WHERE symbol="ftruncate64"), (SELECT IntegerSigned FROM local_const)),
                       ("length", 1, (SELECT id FROM LibcHook WHERE symbol="ftruncate64"), (SELECT LongSigned FROM local_const)),
+                      -- mkfifo
+                      ("pathname", 0, (SELECT id FROM LibcHook WHERE symbol="mkfifo"), (SELECT String FROM local_const)),
+                      ("mode", 1, (SELECT id FROM LibcHook WHERE symbol="mkfifo"), (SELECT IntegerUnsigned FROM local_const)),
+                      -- mkfifoat
+                      ("dirfd", 0, (SELECT id FROM LibcHook WHERE symbol="mkfifoat"), (SELECT IntegerSigned FROM local_const)),
+                      ("pathname", 1, (SELECT id FROM LibcHook WHERE symbol="mkfifoat"), (SELECT String FROM local_const)),
+                      ("mode", 2, (SELECT id FROM LibcHook WHERE symbol="mkfifoat"), (SELECT IntegerUnsigned FROM local_const)),
                       -- mknod
                       ("pathname", 0, (SELECT id FROM LibcHook WHERE symbol="mknod"), (SELECT String FROM local_const)),
                       ("mode", 1, (SELECT id FROM LibcHook WHERE symbol="mknod"), (SELECT IntegerUnsigned FROM local_const)),
@@ -356,6 +380,34 @@ SELECT * FROM (VALUES -- Execution
                       ("dev", 3, (SELECT id FROM LibcHook WHERE symbol="mknodat"), (SELECT LongUnsigned FROM local_const)),
                       -- mkstemp
                       ("template", 0, (SELECT id FROM LibcHook WHERE symbol="mkstemp"), (SELECT String FROM local_const)),
+                      -- mkdtemp
+                      ("template", 0, (SELECT id FROM LibcHook WHERE symbol="mkdtemp"), (SELECT String FROM local_const)),
+                      -- mkostemp
+                      ("template", 0, (SELECT id FROM LibcHook WHERE symbol="mkostemp"), (SELECT String FROM local_const)),
+                      ("flags", 1, (SELECT id FROM LibcHook WHERE symbol="mkostemp"), (SELECT IntegerSigned FROM local_const)),
+                      -- mkstemps
+                      ("template", 0, (SELECT id FROM LibcHook WHERE symbol="mkstemps"), (SELECT String FROM local_const)),
+                      ("suffixlen", 1, (SELECT id FROM LibcHook WHERE symbol="mkstemps"), (SELECT IntegerSigned FROM local_const)),
+                      -- mkostemps
+                      ("template", 0, (SELECT id FROM LibcHook WHERE symbol="mkostemps"), (SELECT String FROM local_const)),
+                      ("suffixlen", 1, (SELECT id FROM LibcHook WHERE symbol="mkostemps"), (SELECT IntegerSigned FROM local_const)),
+                      ("flags", 2, (SELECT id FROM LibcHook WHERE symbol="mkostemps"), (SELECT IntegerSigned FROM local_const)),
+                      -- mkostemp64
+                      ("template", 0, (SELECT id FROM LibcHook WHERE symbol="mkostemp64"), (SELECT String FROM local_const)),
+                      ("flags", 1, (SELECT id FROM LibcHook WHERE symbol="mkostemp64"), (SELECT IntegerSigned FROM local_const)),
+                      -- mkostemps64
+                      ("template", 0, (SELECT id FROM LibcHook WHERE symbol="mkostemps64"), (SELECT String FROM local_const)),
+                      ("suffixlen", 1, (SELECT id FROM LibcHook WHERE symbol="mkostemps64"), (SELECT IntegerSigned FROM local_const)),
+                      ("flags", 2, (SELECT id FROM LibcHook WHERE symbol="mkostemps64"), (SELECT IntegerSigned FROM local_const)),
+                      -- mkstemp64
+                      ("template", 0, (SELECT id FROM LibcHook WHERE symbol="mkstemp64"), (SELECT String FROM local_const)),
+                      -- mkstemps64
+                      ("template", 0, (SELECT id FROM LibcHook WHERE symbol="mkstemps64"), (SELECT String FROM local_const)),
+                      ("suffixlen", 1, (SELECT id FROM LibcHook WHERE symbol="mkstemps64"), (SELECT IntegerSigned FROM local_const)),
+                      -- tmpfile
+                      -- No arguments
+                      -- tmpfile64
+                      -- No arguments
                       -- __open64_2
                       ("pathname", 0, (SELECT id FROM LibcHook WHERE symbol="__open64_2"), (SELECT String FROM local_const)),
                       ("flags", 1, (SELECT id FROM LibcHook WHERE symbol="__open64_2"), (SELECT IntegerSigned FROM local_const)),
@@ -418,6 +470,8 @@ WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.
 SELECT * FROM (VALUES -- AddInt
                       -- ModifyInt
                       ("0", NULL), -- LM_ID_BASE
+                      -- Exit
+                      ("1", NULL),
                       -- RedirectFunction
                       ("execve", NULL), ((SELECT libc FROM local_const), last_insert_rowid()),
                       ("posix_spawn", NULL), ((SELECT libc FROM local_const), last_insert_rowid()),
@@ -669,5 +723,25 @@ SELECT * FROM (VALUES -- Execution
                       -- Network
                       -- Check if the target socket address is whitelisted
                       ((SELECT id FROM LibcHook WHERE symbol="connect"), 1, (SELECT VerifyCanConnect FROM local_const), NULL));
+
+-- Unimplemented functions
+INSERT INTO Rule (hook, position, action, actionarg)
+WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.6") AS libc,
+                            (SELECT id FROM Action WHERE name="Exit") AS Exit)
+SELECT * FROM (VALUES -- Exit program with status 1
+                      ((SELECT id FROM LibcHook WHERE symbol="freopen"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="freopen64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkfifo"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkfifoat"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkdtemp"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkostemp"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkostemps"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemps"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkostemp64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkostemps64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemp64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="mkstemps64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="tmpfile"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))),
+                      ((SELECT id FROM LibcHook WHERE symbol="tmpfile64"), NULL, (SELECT Exit FROM local_const), (SELECT id FROM ActionArgument WHERE value=(SELECT libc FROM local_const) AND next=(SELECT id FROM ActionArgument WHERE value="1" AND next IS NULL))));
 
 COMMIT;

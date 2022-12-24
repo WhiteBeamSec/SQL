@@ -7,7 +7,6 @@ Publisher: WhiteBeam Security, Inc.
 Version: 0.3.0-dev
 */
 
--- TODO: mkfifo*
 -- TODO 0.4.0: RedirectFunction all MemoryProtection functions to FORTIFY_SOURCE equivalents?
 
 CREATE TEMPORARY TABLE IF NOT EXISTS global_const
