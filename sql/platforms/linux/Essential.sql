@@ -23,7 +23,6 @@ Version: 0.3.0-dev
 --   mkstemps64
 --   mkfifo
 --   mkfifoat
--- TODO: Whitelist *mknod* major dev, corresponding action?
 -- TODO: Dynamically mangle/demangle C++ symbols
 
 CREATE TEMPORARY TABLE IF NOT EXISTS global_const
@@ -508,6 +507,7 @@ WITH local_const AS (SELECT ((SELECT LibraryPath FROM global_const) || "libc.so.
                             (SELECT id FROM Action WHERE name="SplitFilePath") AS SplitFilePath,
                             (SELECT id FROM Action WHERE name="VerifyCanConnect") AS VerifyCanConnect,
                             (SELECT id FROM Action WHERE name="VerifyCanExecute") AS VerifyCanExecute,
+                            (SELECT id FROM Action WHERE name="VerifyCanMakeNode") AS VerifyCanMakeNode,
                             (SELECT id FROM Action WHERE name="VerifyCanTerminate") AS VerifyCanTerminate,
                             (SELECT id FROM Action WHERE name="VerifyCanWrite") AS VerifyCanWrite,
                             (SELECT id FROM Action WHERE name="VerifyFileHash") AS VerifyFileHash)
@@ -673,6 +673,11 @@ SELECT * FROM (VALUES -- Execution
                       ((SELECT id FROM LibcHook WHERE symbol="__openat_2"), 0, (SELECT VerifyCanWrite FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="__openat64_2"), 0, (SELECT VerifyCanWrite FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="__xmknodat"), 1, (SELECT VerifyCanWrite FROM local_const), NULL),
+                      -- Check if the major device number is whitelisted for *mknod*
+                      ((SELECT id FROM LibcHook WHERE symbol="mknod"), 2, (SELECT VerifyCanMakeNode FROM local_const), NULL),
+                      ((SELECT id FROM LibcHook WHERE symbol="mknodat"), 2, (SELECT VerifyCanMakeNode FROM local_const), NULL),
+                      ((SELECT id FROM LibcHook WHERE symbol="__xmknod"), 3, (SELECT VerifyCanMakeNode FROM local_const), NULL),
+                      ((SELECT id FROM LibcHook WHERE symbol="__xmknodat"), 3, (SELECT VerifyCanMakeNode FROM local_const), NULL),
                       -- Convert variadic parameters into regular parameters
                       ((SELECT id FROM LibcHook WHERE symbol="open"), 3, (SELECT ConsumeVariadic FROM local_const), NULL),
                       ((SELECT id FROM LibcHook WHERE symbol="open64"), 3, (SELECT ConsumeVariadic FROM local_const), NULL),
